@@ -9,36 +9,27 @@ public class ApplicationDB {
 		
 	}
 
-	public Connection getConnection(){
-		
-		//Create a connection string
-		String connectionUrl = "jdbc:mysql://localhost:3306/336project";
-		Connection connection = null;
-		
-		try {
-			//Load JDBC driver - the interface standardizing the connection procedure. Look at WEB-INF\lib for a mysql connector jar file, otherwise it fails.
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			//Create a connection to your DB
-			connection = DriverManager.getConnection(connectionUrl,"root", "root");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return connection;
-		
+	public Connection getConnection() {
+
+	    String connectionUrl = "jdbc:mysql://localhost:3306/336project?useSSL=false&serverTimezone=UTC";
+	    Connection connection = null;
+
+	    try {
+	        // Updated driver class name for MySQL 8.x
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+
+	        // Connect to DB
+	        connection = DriverManager.getConnection(connectionUrl, "root", "cs336project");
+
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return connection;
 	}
+
 	
 	public void closeConnection(Connection connection){
 		try {

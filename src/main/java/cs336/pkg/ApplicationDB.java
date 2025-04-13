@@ -11,7 +11,7 @@ public class ApplicationDB {
 
 	public Connection getConnection() {
 
-	    String connectionUrl = "jdbc:mysql://localhost:3306/336project?useSSL=false&serverTimezone=UTC";
+	    String connectionUrl = "jdbc:mysql://localhost:3306/336project"; // change the "336project" in the url to the name of your database
 	    Connection connection = null;
 
 	    try {
@@ -19,7 +19,7 @@ public class ApplicationDB {
 	        Class.forName("com.mysql.cj.jdbc.Driver");
 
 	        // Connect to DB
-	        connection = DriverManager.getConnection(connectionUrl, "root", "cs336project");
+	        connection = DriverManager.getConnection(connectionUrl, "root", "cs336project"); //change root and cs336project to your username and password
 
 	    } catch (ClassNotFoundException e) {
 	        e.printStackTrace();

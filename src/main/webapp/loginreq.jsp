@@ -6,18 +6,16 @@
 <%
 		String username = request.getParameter("username");
 		String pass = request.getParameter("password");
-		String role = request.getParameter("user");
 		
 		
 		
 		try{
-
-			if (username.isEmpty() || pass.isEmpty() || role == null) throw new SQLSyntaxErrorException();
+			if (username.isEmpty() || pass.isEmpty()) throw new SQLSyntaxErrorException();
 			
 			ApplicationDB db = new ApplicationDB();	
 			Connection con = db.getConnection();	
 			
-	        String query = "select * from " + role + " where username = ? and password = ?";
+	        String query = "select * from users where username = ? and password = ?";
 	        
 	     	PreparedStatement pst = con.prepareStatement(query);
 		    pst.setString(1, username);
@@ -25,19 +23,22 @@
 		    
 		    ResultSet rs = pst.executeQuery();
 		    
+		    
 		    if (rs.next()) {
-		    	HttpSession ses = request.getSession();
+		    	String role = rs.getString("role");
+		    	session.setAttribute("username", username);
+		    	session.setAttribute("role", role);
 		    	
-		        ses.setAttribute("username", username); 
-
-		        if (role.equals("Customer")) {
+		        if (role.equalsIgnoreCase("customer")) {
 		        	response.sendRedirect("./customer/index.jsp");
-		        } else {
+		        } else if(role.equalsIgnoreCase("customer_rep")){
 		        	response.sendRedirect("./rep/index.jsp");
+		        }else if(role.equalsIgnoreCase("admin")){
+		        	response.sendRedirect("./admin/index.jsp");
 		        }
-		        
+		        return;
 		    } else {
-		        out.println("Invalid username or password <a href='./index.jsp'>try again</a>");
+		        out.println("Invalid username or password <a href='./login.jsp'>try again</a>");
 		    }
 			
 		    rs.close();
@@ -46,7 +47,7 @@
 		        		
 		        		
 		}catch(SQLSyntaxErrorException e){
-			out.println("Enter all information. <a href='./index.jsp'>try again</a>");
+			out.println("Enter all information. <a href='./login.jsp'>try again</a>");
 		    e.printStackTrace();		
 			
 		} catch (Exception e) {

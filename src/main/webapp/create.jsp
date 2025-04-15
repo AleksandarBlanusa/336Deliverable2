@@ -23,7 +23,7 @@
 	<input type="text" name="password" id="password" placeholder="Password">
 	<br>
 	
-	<input type="radio" name="user" id="employee" value="customer_rep">
+	<input type="radio" name="user" id="customer_rep" value="customer_rep">
 	<label for="employee">Customer Rep</label>
 	
 	<input type="radio" name="user" id="customer" value="customer">
@@ -33,7 +33,7 @@
 	<input type="submit" value="submit">
 	
 </form>
-<p>Already have an account? <a href = "./index.jsp">Login</a></p>
+<p>Already have an account? <a href = "./login.jsp">Login</a></p>
 </div>
 </body>
 </html>

@@ -9,6 +9,6 @@
 	    currentSession.invalidate();
 	}
 	
-	response.sendRedirect("./index.jsp");
+	out.println("You have been logged out! <a href='./login.jsp'>login here</a>");
 
 %>

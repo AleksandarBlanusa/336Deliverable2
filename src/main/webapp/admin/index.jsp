@@ -7,9 +7,9 @@
         String username = (String) session.getAttribute("username");
     	String role = (String) session.getAttribute("role");
         if (username != null) {
-            out.println("Welcome " + username + ", You are a " + role);
+            out.println("Welcome " + username + ", You are an " + role);
             out.println("<a href='../logout.jsp'>Log out</a>");
         } else {
-            response.sendRedirect("../login.jsp");
+            response.sendRedirect("../login.jsp"); 
         }
     %>

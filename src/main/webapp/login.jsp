@@ -23,13 +23,6 @@
 	<input type="text" name="password" id="password" placeholder="Password">
 	<br>
 	
-	<input type="radio" name="user" id="employee" value="Customer_Rep">
-	<label for="employee">Customer Rep</label>
-	
-	<input type="radio" name="user" id="customer" value="Customer">
-	<label for="customer">Customer</label>
-	<br>
-	
 	<input type="submit" value="submit">
 	
 </form>

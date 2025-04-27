@@ -18,6 +18,98 @@ USE `336project`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `aircrafts`
+--
+
+DROP TABLE IF EXISTS `aircrafts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aircrafts` (
+  `aircraft_id` int DEFAULT NULL,
+  `airline` varchar(30) DEFAULT NULL,
+  UNIQUE KEY `aircraft_id` (`aircraft_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `aircrafts`
+--
+
+LOCK TABLES `aircrafts` WRITE;
+/*!40000 ALTER TABLE `aircrafts` DISABLE KEYS */;
+INSERT INTO `aircrafts` VALUES (1,'United'),(2,'American Airlines'),(3,'Delta'),(4,'Southwest'),(5,'Emirates');
+/*!40000 ALTER TABLE `aircrafts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `airports`
+--
+
+DROP TABLE IF EXISTS `airports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `airports` (
+  `airport_id` int NOT NULL,
+  `airport_code` varchar(3) DEFAULT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `state` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`airport_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `airports`
+--
+
+LOCK TABLES `airports` WRITE;
+/*!40000 ALTER TABLE `airports` DISABLE KEYS */;
+INSERT INTO `airports` VALUES (1,'EWR','Newark','New Jersey'),(2,'RDU','Raleigh','North Carolina'),(3,'BOS','Boston','Massachusetts'),(4,'ORD','Chicago','Illinois');
+/*!40000 ALTER TABLE `airports` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `flights`
+--
+
+DROP TABLE IF EXISTS `flights`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `flights` (
+  `flight_id` int NOT NULL,
+  `aircraft_id` int DEFAULT NULL,
+  `available_first_class_seats` int DEFAULT NULL,
+  `available_business_seats` int DEFAULT NULL,
+  `available_economy_seats` int DEFAULT NULL,
+  `firstclass_price` int DEFAULT NULL,
+  `business_price` int DEFAULT NULL,
+  `economy_price` int DEFAULT NULL,
+  `stops` int DEFAULT NULL,
+  `takeoff_time` datetime DEFAULT NULL,
+  `landing_time` datetime DEFAULT NULL,
+  `duration` int DEFAULT NULL,
+  `origin_airport_id` int DEFAULT NULL,
+  `destination_airport_id` int DEFAULT NULL,
+  PRIMARY KEY (`flight_id`),
+  KEY `aircraft_id` (`aircraft_id`),
+  KEY `origin_airport_id` (`origin_airport_id`),
+  KEY `destination_airport_id` (`destination_airport_id`),
+  CONSTRAINT `flights_ibfk_1` FOREIGN KEY (`aircraft_id`) REFERENCES `aircrafts` (`aircraft_id`),
+  CONSTRAINT `flights_ibfk_2` FOREIGN KEY (`origin_airport_id`) REFERENCES `airports` (`airport_id`),
+  CONSTRAINT `flights_ibfk_3` FOREIGN KEY (`destination_airport_id`) REFERENCES `airports` (`airport_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `flights`
+--
+
+LOCK TABLES `flights` WRITE;
+/*!40000 ALTER TABLE `flights` DISABLE KEYS */;
+INSERT INTO `flights` VALUES (1,2,5,5,20,200,100,50,0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,4,1),(2,1,2,5,20,200,100,50,0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,1,2),(3,5,3,3,20,200,100,50,0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,3,2);
+/*!40000 ALTER TABLE `flights` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -50,4 +142,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-15 15:32:08
+-- Dump completed on 2025-04-27  1:23:24

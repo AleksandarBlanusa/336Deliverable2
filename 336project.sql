@@ -25,9 +25,9 @@ DROP TABLE IF EXISTS `aircrafts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `aircrafts` (
-  `aircraft_id` int DEFAULT NULL,
+  `aircraft_id` INT NOT NULL AUTO_INCREMENT,
   `airline` varchar(30) DEFAULT NULL,
-  UNIQUE KEY `aircraft_id` (`aircraft_id`)
+  PRIMARY KEY (`aircraft_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -49,7 +49,7 @@ DROP TABLE IF EXISTS `airports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `airports` (
-  `airport_id` int NOT NULL,
+  `airport_id` INT NOT NULL AUTO_INCREMENT,
   `airport_code` varchar(3) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
   `state` varchar(30) DEFAULT NULL,
@@ -75,11 +75,14 @@ DROP TABLE IF EXISTS `flights`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `flights` (
-  `flight_id` int NOT NULL,
+  `flight_id` INT NOT NULL AUTO_INCREMENT,
   `aircraft_id` int DEFAULT NULL,
-  `available_first_class_seats` int DEFAULT NULL,
-  `available_business_seats` int DEFAULT NULL,
-  `available_economy_seats` int DEFAULT NULL,
+  `total_first_class_seats` int DEFAULT NULL,
+  `total_business_seats` int DEFAULT NULL,
+  `total_economy_seats` int DEFAULT NULL,
+  `sold_firstclass_seats` int DEFAULT 0,
+  `sold_business_seats` int DEFAULT 0,
+  `sold_economy_seats` int DEFAULT 0,
   `firstclass_price` int DEFAULT NULL,
   `business_price` int DEFAULT NULL,
   `economy_price` int DEFAULT NULL,
@@ -89,6 +92,7 @@ CREATE TABLE `flights` (
   `duration` int DEFAULT NULL,
   `origin_airport_id` int DEFAULT NULL,
   `destination_airport_id` int DEFAULT NULL,
+  `total_seats_sold` int DEFAULT 0,
   PRIMARY KEY (`flight_id`),
   KEY `aircraft_id` (`aircraft_id`),
   KEY `origin_airport_id` (`origin_airport_id`),
@@ -105,7 +109,7 @@ CREATE TABLE `flights` (
 
 LOCK TABLES `flights` WRITE;
 /*!40000 ALTER TABLE `flights` DISABLE KEYS */;
-INSERT INTO `flights` VALUES (1,2,5,5,20,200,100,50,0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,4,1),(2,1,2,5,20,200,100,50,0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,1,2),(3,5,3,3,20,200,100,50,0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,3,2);
+INSERT INTO `flights` VALUES (1,2,5,5,20,0,0,0,200,100,50,0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,4,1,0),(2,1,2,5,20,0,0,0,200,100,50,0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,1,2,0),(3,5,3,3,20,0,0,0,200,100,50,0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,3,2,0);
 /*!40000 ALTER TABLE `flights` ENABLE KEYS */;
 UNLOCK TABLES;
 

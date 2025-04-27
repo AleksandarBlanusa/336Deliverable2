@@ -54,6 +54,7 @@ UNLOCK TABLES;
 CREATE TABLE `airports` (
   `airport_id` INT NOT NULL AUTO_INCREMENT,
   `airport_name` VARCHAR(100) NOT NULL,
+  `airport_code` VARCHAR(10) NOT NULL,
   `location` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`airport_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

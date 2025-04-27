@@ -26,7 +26,9 @@
 		    
 		    if (rs.next()) {
 		    	String role = rs.getString("role");
+		    	String firstname = rs.getString("firstname");
 		    	session.setAttribute("username", username);
+		    	session.setAttribute("firstname", firstname);
 		    	session.setAttribute("role", role);
 		    	
 		        if (role.equalsIgnoreCase("customer")) {

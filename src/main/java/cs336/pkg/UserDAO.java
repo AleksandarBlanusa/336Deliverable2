@@ -1,3 +1,7 @@
+package cs336.pkg;
+import cs336.pkg.User;
+import cs336.pkg.DatabaseUtil;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

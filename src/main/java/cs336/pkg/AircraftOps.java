@@ -1,4 +1,7 @@
 package cs336.pkg;
+import cs336.pkg.Airport;
+import cs336.pkg.Aircraft;
+import cs336.pkg.Flight;
 
 
 import java.util.List;

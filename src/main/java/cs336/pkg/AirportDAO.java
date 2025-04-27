@@ -1,3 +1,4 @@
+package cs336.pkg;
 import cs336.pkg.Airport;
 import cs336.pkg.DatabaseUtil;
 

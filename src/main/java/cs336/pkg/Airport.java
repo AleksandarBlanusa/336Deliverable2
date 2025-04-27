@@ -1,3 +1,5 @@
+package cs336.pkg;
+
 public class Airport {
     private int airportId;
     private String airportCode;

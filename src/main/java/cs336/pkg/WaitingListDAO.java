@@ -1,7 +1,8 @@
-import com.flightreservation.model.WaitingList;
-import com.flightreservation.model.Customer;
-import com.flightreservation.model.Flight;
-import com.flightreservation.util.DatabaseUtil;
+package cs336.pkg;
+import cs336.pkg.DatabaseUtil;
+import cs336.pkg.Customer;
+import cs336.pkg.Flight;
+import cs336.pkg.WaitingList;
 
 import java.sql.*;
 import java.util.ArrayList;

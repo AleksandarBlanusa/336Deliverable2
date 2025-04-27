@@ -1,8 +1,11 @@
-import com.336Entities.Flight;
-import com.flightreservation.model.Airline;
-import com.flightreservation.model.Airport;
-import com.flightreservation.model.Aircraft;
-import com.flightreservation.util.DatabaseUtil;
+package cs336.pkg;
+
+import cs336.pkg.Airport;
+import cs336.pkg.Customer;
+import cs336.pkg.Flight;
+import cs336.pkg.Airline;
+import cs336.pkg.Aircraft;
+import cs336.pkg.DatabaseUtil;
 
 import java.sql.*;
 import java.util.ArrayList;

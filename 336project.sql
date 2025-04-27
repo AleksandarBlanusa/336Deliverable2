@@ -98,6 +98,7 @@ CREATE TABLE `customers` (
   `last_name` VARCHAR(100) NOT NULL,
   `email` VARCHAR(100),
   `phone_number` VARCHAR(15),
+  `address` VARCHAR(100) NOT NULL,
   `username` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`customer_id`),
   FOREIGN KEY (`username`) REFERENCES `users` (`username`)

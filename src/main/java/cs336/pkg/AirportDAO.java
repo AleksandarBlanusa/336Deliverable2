@@ -1,6 +1,6 @@
 package cs336.pkg;
 import cs336.pkg.Airport;
-import cs336.pkg.DatabaseUtil;
+import cs336.pkg.ApplicationDB;
 
 import java.sql.*;
 import java.util.ArrayList;

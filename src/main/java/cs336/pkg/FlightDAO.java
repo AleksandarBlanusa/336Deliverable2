@@ -5,7 +5,7 @@ import cs336.pkg.Customer;
 import cs336.pkg.Flight;
 import cs336.pkg.Airline;
 import cs336.pkg.Aircraft;
-import cs336.pkg.DatabaseUtil;
+import cs336.pkg.ApplicationDB;
 
 import java.sql.*;
 import java.util.ArrayList;

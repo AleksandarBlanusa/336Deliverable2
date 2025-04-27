@@ -1,5 +1,5 @@
-import ProjectStuff.model.Airport;
-import ProjectStuff.DatabaseUtil;
+import cs336.pkg.Airport;
+import cs336.pkg.DatabaseUtil;
 
 import java.sql.*;
 import java.util.ArrayList;

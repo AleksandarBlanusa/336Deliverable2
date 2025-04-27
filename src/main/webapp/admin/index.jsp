@@ -5,10 +5,9 @@
 
     <%
         String username = (String) session.getAttribute("username");
-    	String firstname = (String) session.getAttribute("firstname");
     	String role = (String) session.getAttribute("role");
-        if (username != null && firstname != null) {
-            out.println("Welcome " + firstname + ", You are an " + role);
+        if (username != null) {
+            out.println("Welcome " + username + ", You are an " + role);
             out.println("<a href='../logout.jsp'>Log out</a>");
         } else {
             response.sendRedirect("../login.jsp"); 

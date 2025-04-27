@@ -145,14 +145,6 @@ UNLOCK TABLES;
 <<<<<<< HEAD
 -- Dump completed on 2025-04-27  1:23:24
 =======
--- Airports table
-CREATE TABLE `airports` (
-  `airport_id` INT NOT NULL AUTO_INCREMENT,
-  `airport_name` VARCHAR(100) NOT NULL,
-  `airport_code` VARCHAR(10) NOT NULL,
-  `location` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`airport_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Airlines table
 CREATE TABLE `airlines` (
@@ -160,31 +152,6 @@ CREATE TABLE `airlines` (
   `airline_name` VARCHAR(100) NOT NULL,
   `airline_code` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`airline_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Aircrafts table
-CREATE TABLE `aircrafts` (
-  `aircraft_id` INT NOT NULL AUTO_INCREMENT,
-  `aircraft_type` VARCHAR(50) NOT NULL,
-  `capacity` INT NOT NULL,
-  `airline_id` INT NOT NULL,
-  PRIMARY KEY (`aircraft_id`),
-  FOREIGN KEY (`airline_id`) REFERENCES `airlines` (`airline_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Flights table
-CREATE TABLE `flights` (
-  `flight_id` INT NOT NULL AUTO_INCREMENT,
-  `flight_number` VARCHAR(20) NOT NULL,
-  `departure_time` DATETIME NOT NULL,
-  `arrival_time` DATETIME NOT NULL,
-  `departure_airport_id` INT NOT NULL,
-  `arrival_airport_id` INT NOT NULL,
-  `aircraft_id` INT NOT NULL,
-  PRIMARY KEY (`flight_id`),
-  FOREIGN KEY (`departure_airport_id`) REFERENCES `airports` (`airport_id`),
-  FOREIGN KEY (`arrival_airport_id`) REFERENCES `airports` (`airport_id`),
-  FOREIGN KEY (`aircraft_id`) REFERENCES `aircrafts` (`aircraft_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Customers table

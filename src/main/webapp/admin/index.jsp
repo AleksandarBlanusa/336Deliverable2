@@ -28,10 +28,7 @@
 	<p><a href='../logout.jsp'>Log out</a></p>
 	
 	<p>
-	<a href = "./add-user.jsp">Add</a>
-	<a href = "./add-cust.jsp">Edit</a>
-	<a href = "./add-cust.jsp">Delete</a>
-	
+	<a href = "./add-user.jsp">Add User</a>
 	</p>
 	
 	<div>
@@ -75,6 +72,8 @@
 	            out.println("<td>" + password + "</td>");
 	            out.println("<td>" + user_role + "</td>");
 	            out.println("<td>");
+	            out.println("<button onclick=\"location.href='./edit.jsp?userid=" + userid + "'\">Edit</button>");
+	            out.println("<button onclick=\"location.href='./req/delete.jsp?userid=" + userid + "'\">Delete</button>");
 	            out.println("</td>");
 	            out.println("</tr>");
 	        }

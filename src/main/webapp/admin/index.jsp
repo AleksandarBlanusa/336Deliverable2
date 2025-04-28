@@ -3,6 +3,16 @@
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 
+    <%
+        String user = (String) session.getAttribute("username");
+    	String firstname = (String) session.getAttribute("firstname");
+    	String role = (String) session.getAttribute("role");
+    	
+        if (user == null || firstname == null) {
+        	response.sendRedirect("../login.jsp"); 
+        	return;
+        }
+    %>
 
 <!DOCTYPE html>
 <html>
@@ -15,19 +25,25 @@
 	<h1>
 	Manage Users
 	</h1>
+	<p><a href='../logout.jsp'>Log out</a></p>
 	
 	<p>
-	<!-- buttons for other operations go here -->
+	<a href = "./add-user.jsp">Add</a>
+	<a href = "./add-cust.jsp">Edit</a>
+	<a href = "./add-cust.jsp">Delete</a>
+	
 	</p>
 	
 	<div>
 	<table>
 		<tr>
+			<td>User_id</td>
 			<td>First Name</td>
 			<td>Last Name</td>
 			<td>Username</td>
 			<td>Email</td>
 			<td>Password</td>
+			<td>Role</td>
 		</tr>
 	
 		<%
@@ -41,19 +57,23 @@
 	        ResultSet rs = stmt.executeQuery(query);
 	        
 	        while (rs.next()) {
+	        	String userid = rs.getString("user_id");
 	            String first = rs.getString("firstname");
 	            String last = rs.getString("lastname");
 	            String username = rs.getString("username");
 	            String email = rs.getString("email");
 	            String password = rs.getString("password");
+	            String user_role = rs.getString("role"); 
 	            
 	            // Display employee information in table rows
 	            out.println("<tr>");
+	            out.println("<td>" + userid + "</td>");
 	            out.println("<td>" + first + "</td>");
 	            out.println("<td>" + last + "</td>");
 	            out.println("<td>" + username + "</td>");
 	            out.println("<td>" + email + "</td>");
 	            out.println("<td>" + password + "</td>");
+	            out.println("<td>" + user_role + "</td>");
 	            out.println("<td>");
 	            out.println("</td>");
 	            out.println("</tr>");

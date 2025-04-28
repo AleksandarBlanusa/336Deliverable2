@@ -9,10 +9,9 @@ import java.util.List;
 
 public class CustomerRep {
 
-    // Waiting list initialized properly
     private List<Customer> waitingList = new ArrayList<>();
 
-    // Method to make a flight reservation
+    // Make flight reservation
     public boolean makeReservation(Flight flight, Customer customer) {
         if (flight.getCustomers().size() < flight.getAircraft().getCapacity()) {
             flight.getCustomers().add(customer);
@@ -25,12 +24,12 @@ public class CustomerRep {
         }
     }
 
-    // Add to waiting list when flight is fully booked
+    // Add to waiting list if flight is fully booked
     public void addToWaitingList(Customer customer) {
         waitingList.add(customer);
     }
 
-    // Method to edit a reservation
+    // Edit reservation
     public void editReservation(Flight flight, Customer oldCustomer, Customer newCustomer) {
         List<Customer> customers = flight.getCustomers();
         
@@ -44,7 +43,7 @@ public class CustomerRep {
         System.out.println("Customer not found.");
     }
 
-    // Method to cancel a reservation
+    // Cancel reservation
     public void cancelReservation(Flight flight, Customer customer) {
         if (flight.getCustomers().remove(customer)) {
             System.out.println("Reservation cancelled for Customer ID: " + customer.getCustomerId());
@@ -53,7 +52,7 @@ public class CustomerRep {
         }
     }
 
-    // Method to reply to user's questions
+    // Reply to user questions
     public String replyToUser(String question) {
         if (question.equalsIgnoreCase("What are the available flights?")) {
             return "Please check the flight list.";
@@ -64,7 +63,22 @@ public class CustomerRep {
         }
     }
 
-    // Optional: Get the waiting list for a flight (you might want this for checklist item #4)
+    // Give list of flights for given airport
+    public List<Flight> getFlightsByAirport(List<Flight> allFlights, String airportCode) {
+        List<Flight> flightsForAirport = new ArrayList<>();
+
+        for (Flight flight : allFlights) {
+            if (flight.getDepartureAirport().getAirportCode().equalsIgnoreCase(airportCode) ||
+                flight.getArrivalAirport().getAirportCode().equalsIgnoreCase(airportCode)) {
+                flightsForAirport.add(flight);
+            }
+        }
+
+        return flightsForAirport;
+    }
+
+
+    // Get waiting list for flights
     public List<Customer> getWaitingList() {
         return waitingList;
     }

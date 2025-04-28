@@ -7,13 +7,13 @@ import java.util.List;
 
 public class AircraftOps {
 
-    // Add a new aircraft
+    // Add new aircraft
     public void addAircraft(List<Aircraft> aircraftList, Aircraft aircraft) {
         aircraftList.add(aircraft);
         System.out.println("Aircraft added: " + aircraft);
     }
 
-    // Edit an existing aircraft
+    // Edit existing aircraft
     public void editAircraft(List<Aircraft> aircraftList, Aircraft oldAircraft, Aircraft newAircraft) {
         int index = aircraftList.indexOf(oldAircraft);
         if (index != -1) {
@@ -24,7 +24,7 @@ public class AircraftOps {
         }
     }
 
-    // Delete an aircraft
+    // Delete aircraft
     public void deleteAircraft(List<Aircraft> aircraftList, Aircraft aircraft) {
         if (aircraftList.remove(aircraft)) {
             System.out.println("Aircraft removed: " + aircraft);
@@ -33,13 +33,13 @@ public class AircraftOps {
         }
     }
 
-    // Add an airport
+    // Add airport
     public void addAirport(List<Airport> airportList, Airport airport) {
         airportList.add(airport);
         System.out.println("Airport added: " + airport);
     }
 
-    // Edit an airport
+    // Edit airport
     public void editAirport(List<Airport> airportList, Airport oldAirport, Airport newAirport) {
         int index = airportList.indexOf(oldAirport);
         if (index != -1) {
@@ -50,7 +50,7 @@ public class AircraftOps {
         }
     }
 
-    // Delete an airport
+    // Delete airport
     public void deleteAirport(List<Airport> airportList, Airport airport) {
         if (airportList.remove(airport)) {
             System.out.println("Airport removed: " + airport);
@@ -59,13 +59,13 @@ public class AircraftOps {
         }
     }
 
-    // Add a flight
+    // Add flight
     public void addFlight(List<Flight> flightList, Flight flight) {
         flightList.add(flight);
         System.out.println("Flight added: " + flight);
     }
 
-    // Edit a flight
+    // Edit flight
     public void editFlight(List<Flight> flightList, Flight oldFlight, Flight newFlight) {
         int index = flightList.indexOf(oldFlight);
         if (index != -1) {
@@ -76,7 +76,7 @@ public class AircraftOps {
         }
     }
 
-    // Delete a flight
+    // Delete flight
     public void deleteFlight(List<Flight> flightList, Flight flight) {
         if (flightList.remove(flight)) {
             System.out.println("Flight removed: " + flight);

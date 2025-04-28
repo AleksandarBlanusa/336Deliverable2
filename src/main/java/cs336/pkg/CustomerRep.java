@@ -1,5 +1,9 @@
 package cs336.pkg;
 
+import cs336.pkg.Airport;
+import cs336.pkg.Customer;
+import cs336.pkg.Flight;
+
 import java.util.List;
 
 public class CustomerRep{

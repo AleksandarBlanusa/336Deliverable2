@@ -18,6 +18,30 @@ USE `336project`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `aircrafts`
+--
+
+DROP TABLE IF EXISTS `aircrafts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aircrafts` (
+  `aircraft_id` int NOT NULL AUTO_INCREMENT,
+  `model` varchar(20) DEFAULT NULL,
+  `capacity` int DEFAULT NULL,
+  PRIMARY KEY (`aircraft_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `aircrafts`
+--
+
+LOCK TABLES `aircrafts` WRITE;
+/*!40000 ALTER TABLE `aircrafts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `aircrafts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `airline`
 --
 
@@ -76,22 +100,15 @@ DROP TABLE IF EXISTS `flights`;
 CREATE TABLE `flights` (
   `flight_id` int NOT NULL AUTO_INCREMENT,
   `airline_id` varchar(5) NOT NULL,
-  `total_first_class_seats` int DEFAULT NULL,
-  `total_business_seats` int DEFAULT NULL,
-  `total_economy_seats` int DEFAULT NULL,
-  `sold_firstclass_seats` int DEFAULT '0',
-  `sold_business_seats` int DEFAULT '0',
-  `sold_economy_seats` int DEFAULT '0',
-  `firstclass_price` int DEFAULT NULL,
-  `business_price` int DEFAULT NULL,
-  `economy_price` int DEFAULT NULL,
   `stops` int DEFAULT NULL,
   `takeoff_time` datetime DEFAULT NULL,
   `landing_time` datetime DEFAULT NULL,
   `duration` int DEFAULT NULL,
   `origin_airport_code` varchar(3) DEFAULT NULL,
   `destination_airport_code` varchar(3) DEFAULT NULL,
-  `total_seats_sold` int DEFAULT '0',
+  `available_seats` int DEFAULT NULL,
+  `total_seats` int DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`flight_id`),
   KEY `airline_id` (`airline_id`),
   KEY `origin_airport_code` (`origin_airport_code`),
@@ -108,8 +125,67 @@ CREATE TABLE `flights` (
 
 LOCK TABLES `flights` WRITE;
 /*!40000 ALTER TABLE `flights` DISABLE KEYS */;
-INSERT INTO `flights` VALUES (1,'AA',5,5,20,0,0,0,200,100,50,0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',0),(2,'UA',2,5,20,0,0,0,200,100,50,0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',0),(3,'EK',3,3,20,0,0,0,200,100,50,0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',0);
+INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',30,50,10.00),(2,'UA',0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',20,30,7.00),(3,'EK',0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',10,70,15.00);
 /*!40000 ALTER TABLE `flights` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `questions`
+--
+
+DROP TABLE IF EXISTS `questions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `questions` (
+  `question_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `flight_id` int NOT NULL,
+  `question_text` text NOT NULL,
+  `asked_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `answered` tinyint(1) DEFAULT '0',
+  `answer_text` text,
+  PRIMARY KEY (`question_id`),
+  KEY `user_id` (`user_id`),
+  KEY `flight_id` (`flight_id`),
+  CONSTRAINT `questions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `questions_ibfk_2` FOREIGN KEY (`flight_id`) REFERENCES `flights` (`flight_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `questions`
+--
+
+LOCK TABLES `questions` WRITE;
+/*!40000 ALTER TABLE `questions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reservations`
+--
+
+DROP TABLE IF EXISTS `reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reservations` (
+  `reservation_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `flight_id` int NOT NULL,
+  `seat_class` enum('economy','business','first') NOT NULL,
+  `status` enum('reserved','waiting_list','cancelled') NOT NULL DEFAULT 'reserved',
+  `reservation_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`reservation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reservations`
+--
+
+LOCK TABLES `reservations` WRITE;
+/*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -120,13 +196,15 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
+  `user_id` int NOT NULL AUTO_INCREMENT,
   `firstname` varchar(50) DEFAULT NULL,
   `lastname` varchar(50) DEFAULT NULL,
   `username` varchar(50) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
   `password` varchar(50) DEFAULT NULL,
-  `role` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `role` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,8 +213,37 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('Dev','Patel','test','test@gmail.com','test','customer'),('admin','admin','admin','admin@gmail.com','admin','admin'),('Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),('Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),('Alek','test','Alek','test3@gmail.com','test','customer');
+INSERT INTO `users` VALUES (1,'Dev','Patel','test','test@gmail.com','test','customer'),(2,'admin','admin','admin','admin@gmail.com','admin','admin'),(3,'Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),(4,'Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),(5,'Alek','test','Alek','test3@gmail.com','test','customer');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `waiting_list`
+--
+
+DROP TABLE IF EXISTS `waiting_list`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `waiting_list` (
+  `waiting_list_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `flight_id` int NOT NULL,
+  `added_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`waiting_list_id`),
+  KEY `user_id` (`user_id`),
+  KEY `flight_id` (`flight_id`),
+  CONSTRAINT `waiting_list_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `waiting_list_ibfk_2` FOREIGN KEY (`flight_id`) REFERENCES `flights` (`flight_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `waiting_list`
+--
+
+LOCK TABLES `waiting_list` WRITE;
+/*!40000 ALTER TABLE `waiting_list` DISABLE KEYS */;
+/*!40000 ALTER TABLE `waiting_list` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -148,4 +255,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-27 17:42:18
+-- Dump completed on 2025-04-27 20:48:42

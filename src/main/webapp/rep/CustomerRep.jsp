@@ -75,5 +75,10 @@
             } 
         %>
     </table>
+
+    <form action="index.jsp" method="get">
+        <button type="submit">Go Back to Home</button>
+    </form>
+
 </body>
 </html>

@@ -2,7 +2,7 @@
     pageEncoding="ISO-8859-1" import="cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
-  
+
 <%
     String username = (String) session.getAttribute("username");
     String firstname = (String) session.getAttribute("firstname");

@@ -29,7 +29,7 @@ CREATE TABLE `aircrafts` (
   `model` varchar(20) DEFAULT NULL,
   `capacity` int DEFAULT NULL,
   PRIMARY KEY (`aircraft_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,6 +38,7 @@ CREATE TABLE `aircrafts` (
 
 LOCK TABLES `aircrafts` WRITE;
 /*!40000 ALTER TABLE `aircrafts` DISABLE KEYS */;
+INSERT INTO `aircrafts` VALUES (1,'Airbus A380',70),(2,'Boeing 747',50),(3,'Boeing 777',30);
 /*!40000 ALTER TABLE `aircrafts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,13 +110,14 @@ CREATE TABLE `flights` (
   `available_seats` int DEFAULT NULL,
   `total_seats` int DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
+  `aircraft_id` int DEFAULT NULL,
   PRIMARY KEY (`flight_id`),
   KEY `airline_id` (`airline_id`),
   KEY `origin_airport_code` (`origin_airport_code`),
   KEY `destination_airport_code` (`destination_airport_code`),
-  CONSTRAINT `flights_ibfk_1` FOREIGN KEY (`airline_id`) REFERENCES `airline` (`airline_id`),
-  CONSTRAINT `flights_ibfk_2` FOREIGN KEY (`origin_airport_code`) REFERENCES `airports` (`airport_code`),
-  CONSTRAINT `flights_ibfk_3` FOREIGN KEY (`destination_airport_code`) REFERENCES `airports` (`airport_code`)
+  CONSTRAINT `flights_ibfk_1` FOREIGN KEY (`airline_id`) REFERENCES `airline` (`airline_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `flights_ibfk_2` FOREIGN KEY (`origin_airport_code`) REFERENCES `airports` (`airport_code`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `flights_ibfk_3` FOREIGN KEY (`destination_airport_code`) REFERENCES `airports` (`airport_code`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -125,7 +127,7 @@ CREATE TABLE `flights` (
 
 LOCK TABLES `flights` WRITE;
 /*!40000 ALTER TABLE `flights` DISABLE KEYS */;
-INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',30,50,10.00),(2,'UA',0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',20,30,7.00),(3,'EK',0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',10,70,15.00);
+INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',30,50,10.00,2),(2,'UA',0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',20,30,7.00,3),(3,'EK',0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',10,70,15.00,1);
 /*!40000 ALTER TABLE `flights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -176,7 +178,7 @@ CREATE TABLE `reservations` (
   `status` enum('reserved','waiting_list','cancelled') NOT NULL DEFAULT 'reserved',
   `reservation_date` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`reservation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,6 +187,7 @@ CREATE TABLE `reservations` (
 
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
+INSERT INTO `reservations` VALUES (1,1,2,'first','reserved','2025-04-28 23:20:27'),(2,5,2,'business','reserved','2025-04-28 23:21:22'),(3,3,3,'economy','reserved','2025-04-28 23:22:01');
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -234,7 +237,7 @@ CREATE TABLE `waiting_list` (
   KEY `flight_id` (`flight_id`),
   CONSTRAINT `waiting_list_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `waiting_list_ibfk_2` FOREIGN KEY (`flight_id`) REFERENCES `flights` (`flight_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -243,6 +246,7 @@ CREATE TABLE `waiting_list` (
 
 LOCK TABLES `waiting_list` WRITE;
 /*!40000 ALTER TABLE `waiting_list` DISABLE KEYS */;
+INSERT INTO `waiting_list` VALUES (1,1,3,'2025-04-28 23:31:29'),(2,3,1,'2025-04-28 23:32:11');
 /*!40000 ALTER TABLE `waiting_list` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -255,4 +259,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-27 20:48:42
+-- Dump completed on 2025-04-28 23:33:38

@@ -14,10 +14,10 @@
         }
     %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	
 	<h1>Add user</h1>
+	<p><a href='./index.jsp'>Back</a></p>
 
 	<div>
 		<form method = "POST" action = "./req/add.jsp">

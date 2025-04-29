@@ -22,16 +22,16 @@
 </head>
 <body>
 	
-	<h1>
-	Manage Users
-	</h1>
+	<h1>Admin</h1>
+	
 	<p><a href='../logout.jsp'>Log out</a></p>
 	
+	<div>
+	<h1>Manage Users</h1>
 	<p>
 	<a href = "./add-user.jsp">Add User</a>
 	</p>
 	
-	<div>
 	<table>
 		<tr>
 			<td>User_id</td>
@@ -84,6 +84,12 @@
 		%>
 		
 	</table>
+	</div>
+	<div>
+	<h1>Reservations</h1>
+	<h2>By Flight Number</h2>
+	<h2>By Customer Name</h2>
+	
 	</div>
 </body>
 </html>

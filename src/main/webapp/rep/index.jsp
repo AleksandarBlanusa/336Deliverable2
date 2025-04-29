@@ -10,16 +10,15 @@
     if (username != null && firstname != null) {
         out.println("Welcome " + firstname + ", You are an " + role + "<br><br>");
         out.println("<a href='../logout.jsp'>Log out</a><br><br>");
-%>
-        <form action="../CustomerRep.jsp" method="get">
-            <button type="submit">Go to Customer Rep Page</button>
-        </form>
-        
-        <form action="../AircraftOps.jsp" method="get">
-            <button type="submit">Go to Customer Rep Page</button>
-        </form>
-<%
     } else {
         response.sendRedirect("../login.jsp"); 
     }
 %>
+
+		<form action="./CustomerRep.jsp" method="get">
+            <button type="submit">Go to Customer Rep Page</button>
+        </form>
+        
+        <form action="./AircraftOps.jsp" method="get">
+            <button type="submit">Go to Aircraft Operations Page</button>
+        </form>

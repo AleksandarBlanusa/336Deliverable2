@@ -23,10 +23,10 @@ public class Flight {
     private Airport arrivalAirport;
     private Aircraft aircraft;
     
-    private List<Customer> customers;  // List to store customers (passengers) on the flight
+    private List<User> users;  // List to store customers (passengers) on the flight
 
     public Flight() {
-        this.customers = new ArrayList<>();  // Initialize the customer list
+        this.users = new ArrayList<>();  // Initialize the customer list
     }
 
     public Flight(int flightId, String flightNumber, int airlineId, int departureAirportId, 
@@ -43,16 +43,16 @@ public class Flight {
         this.basePrice = basePrice;
         this.availableSeats = availableSeats;
         this.status = status;
-        this.customers = new ArrayList<>();  // Initialize the customer list
+        this.users = new ArrayList<>();  // Initialize the customer list
     }
 
     // Getter and Setter for customers
-    public List<Customer> getCustomers() {
-        return customers;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     // Getter and Setter methods for other fields
@@ -102,9 +102,9 @@ public class Flight {
     public void setAircraft(Aircraft aircraft) { this.aircraft = aircraft; }
 
     // Helper method to check if a customer can be added to the flight
-    public boolean addCustomer(Customer customer) {
-        if (customers.size() < availableSeats) {
-            customers.add(customer);
+    public boolean addUser(User user) {
+        if (users.size() < availableSeats) {
+            users.add(user);
             availableSeats--;  // Decrease the number of available seats
             return true;
         } else {

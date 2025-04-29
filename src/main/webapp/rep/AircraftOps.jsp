@@ -28,18 +28,17 @@
 
         } else if ("addAirport".equals(action)) {
             String code = request.getParameter("airportCode");
-            String name = request.getParameter("airportName");
             String city = request.getParameter("city");
-            String country = request.getParameter("country");
-            ops.addAirport(conn, new Airport(0, code, name, city, country));
+            String state = request.getParameter("state");
+            ops.addAirport(conn, new Airport(0, code, city, state));
             request.setAttribute("message", "Airport added successfully.");
 
         } else if ("editAirport".equals(action)) {
             String oldCode = request.getParameter("oldAirportCode");
             String name = request.getParameter("newAirportName");
             String city = request.getParameter("newCity");
-            String country = request.getParameter("newCountry");
-            ops.editAirport(conn, oldCode, new Airport(0, oldCode, name, city, country));
+            String state = request.getParameter("newState");
+            ops.editAirport(conn, oldCode, new Airport(0, oldCode, city, state));
             request.setAttribute("message", "Airport edited successfully.");
 
         } else if ("deleteAirport".equals(action)) {
@@ -141,12 +140,10 @@
     <input type="hidden" name="action" value="addAirport"> 
     <label>Airport Code:</label><br>
     <input type="text" name="airportCode" maxlength="3" required><br>
-    <label>Airport Name:</label><br>
-    <input type="text" name="airportName" required><br>
     <label>City:</label><br>
     <input type="text" name="city" required><br>
-    <label>Country:</label><br>
-    <input type="text" name="country" required><br>
+    <label>State:</label><br>
+    <input type="text" name="state" required><br>
     <button type="submit">Add Airport</button>
 </form>
 
@@ -157,12 +154,10 @@
     <input type="hidden" name="action" value="editAirport">
     <label>Airport Code (unchanged):</label><br>
     <input type="text" name="oldAirportCode" maxlength="3" required><br>
-    <label>New Airport Name:</label><br>
-    <input type="text" name="newAirportName" required><br>
     <label>New City:</label><br>
     <input type="text" name="newCity" required><br>
-    <label>New Country:</label><br>
-    <input type="text" name="newCountry" required><br>    
+    <label>New State:</label><br>
+    <input type="text" name="newState" required><br>    
     <button type="submit">Edit Airport</button>
 </form>
 

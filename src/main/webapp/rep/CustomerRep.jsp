@@ -1,10 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="cs336.pkg.User" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Reservations</title>
+    <title>User Reservations</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
         form { margin-bottom: 20px; }
@@ -13,37 +15,37 @@
     </style>
 </head>
 <body>
-    <h1>Customer Reservations</h1>
+    <h1>User Reservations</h1>
 
     <h2>Make Reservation</h2>
     <form action="CustomerRepServlet" method="post">
         <label for="flightId">Flight ID:</label><br>
         <input type="number" id="flightId" name="flightId" required><br>
 
-        <label for="customerId">Customer ID:</label><br>
-        <input type="number" id="customerId" name="customerId" required><br>
+        <label for="userId">User ID:</label><br>
+        <input type="number" id="userId" name="userId" required><br>
 
         <button type="submit" name="action" value="makeReservation">Make Reservation</button>
     </form>
 
     <h2>Edit Reservation</h2>
     <form action="CustomerRepServlet" method="post">
-        <label for="oldCustomerId">Old Customer ID:</label><br>
-        <input type="number" id="oldCustomerId" name="oldCustomerId" required><br>
+        <label for="oldUserId">Old User ID:</label><br>
+        <input type="number" id="oldUserId" name="oldUserId" required><br>
 
-        <label for="newCustomerId">New Customer ID:</label><br>
-        <input type="number" id="newCustomerId" name="newCustomerId" required><br>
+        <label for="newUserId">New User ID:</label><br>
+        <input type="number" id="newUserId" name="newUserId" required><br>
 
-        <label for="newCustomerName">New Customer Name:</label><br>
-        <input type="text" id="newCustomerName" name="newCustomerName" required><br>
+        <label for="newUserName">New User Name:</label><br>
+        <input type="text" id="newUserName" name="newUserName" required><br>
 
         <button type="submit" name="action" value="editReservation">Edit Reservation</button>
     </form>
 
     <h2>Cancel Reservation</h2>
     <form action="CustomerRepServlet" method="post">
-        <label for="cancelCustomerId">Customer ID:</label><br>
-        <input type="number" id="cancelCustomerId" name="cancelCustomerId" required><br>
+        <label for="cancelUserId">User ID:</label><br>
+        <input type="number" id="cancelUserId" name="cancelUserId" required><br>
 
         <button type="submit" name="action" value="cancelReservation">Cancel Reservation</button>
     </form>
@@ -58,16 +60,15 @@
 
     <h2>View Waiting List</h2>
     <table border="1">
-        <tr><th>Customer ID</th><th>Name</th></tr>
+        <tr><th>User ID</th><th>Name</th></tr>
         <% 
-            // Assuming the waiting list is available in the request scope
-            List<Customer> waitingList = (List<Customer>) request.getAttribute("waitingList");
+            List<User> waitingList = (List<User>) request.getAttribute("waitingList");
             if (waitingList != null) {
-                for (Customer customer : waitingList) {
+                for (User user : waitingList) {
         %>
                     <tr>
-                        <td><%= customer.getCustomerId() %></td>
-                        <td><%= customer.getFirstName() + " " + customer.getLastName() %></td>
+                        <td><%= user.getUserId() %></td>
+                        <td><%= user.getFullName() %></td>
                     </tr>
         <%  
                 }

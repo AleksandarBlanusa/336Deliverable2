@@ -1,3 +1,4 @@
+package cs336.pkg;
 import java.time.LocalDateTime;
 
 public class WaitingList {

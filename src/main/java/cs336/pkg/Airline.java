@@ -1,3 +1,4 @@
+package cs336.pkg;
 public class Airline {
     private int airlineId;
     private String airlineName;

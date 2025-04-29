@@ -1,3 +1,5 @@
+package cs336.pkg;
+
 public class Aircraft {
     private int aircraftId;
     private String aircraftType;

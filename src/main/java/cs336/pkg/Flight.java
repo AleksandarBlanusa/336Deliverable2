@@ -1,5 +1,9 @@
+package cs336.pkg;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Flight {
     private int flightId;
@@ -19,8 +23,12 @@ public class Flight {
     private Airport arrivalAirport;
     private Aircraft aircraft;
     
-    public Flight() {}
-    
+    private List<Customer> customers;  // List to store customers (passengers) on the flight
+
+    public Flight() {
+        this.customers = new ArrayList<>();  // Initialize the customer list
+    }
+
     public Flight(int flightId, String flightNumber, int airlineId, int departureAirportId, 
                  int arrivalAirportId, int aircraftId, LocalDateTime departureTime, LocalDateTime arrivalTime, 
                  BigDecimal basePrice, int availableSeats, String status) {
@@ -35,8 +43,19 @@ public class Flight {
         this.basePrice = basePrice;
         this.availableSeats = availableSeats;
         this.status = status;
+        this.customers = new ArrayList<>();  // Initialize the customer list
     }
-    
+
+    // Getter and Setter for customers
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
+
+    // Getter and Setter methods for other fields
     public int getFlightId() { return flightId; }
     public void setFlightId(int flightId) { this.flightId = flightId; }
     
@@ -81,7 +100,18 @@ public class Flight {
     
     public Aircraft getAircraft() { return aircraft; }
     public void setAircraft(Aircraft aircraft) { this.aircraft = aircraft; }
-    
+
+    // Helper method to check if a customer can be added to the flight
+    public boolean addCustomer(Customer customer) {
+        if (customers.size() < availableSeats) {
+            customers.add(customer);
+            availableSeats--;  // Decrease the number of available seats
+            return true;
+        } else {
+            return false;  // Flight is full
+        }
+    }
+
     @Override
     public String toString() {
         return "Flight{" +

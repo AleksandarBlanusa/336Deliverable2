@@ -13,8 +13,7 @@ public class CustomerRep {
 
     // Make flight reservation
     public boolean makeReservation(Flight flight, Customer customer) {
-        if (flight.getCustomers().size() < flight.getAircraft().getCapacity()) {
-            flight.getCustomers().add(customer);
+        if (flight.addCustomer(customer)) {
             System.out.println("Reservation made for " + customer.getFirstName() + " on Flight ID: " + flight.getFlightId());
             return true;
         } else {
@@ -47,6 +46,13 @@ public class CustomerRep {
     public void cancelReservation(Flight flight, Customer customer) {
         if (flight.getCustomers().remove(customer)) {
             System.out.println("Reservation cancelled for Customer ID: " + customer.getCustomerId());
+            // Check if any customers are waiting and move one to the flight
+            if (!waitingList.isEmpty()) {
+                Customer nextCustomer = waitingList.remove(0); // Get the first customer in the waiting list
+                if (flight.addCustomer(nextCustomer)) {
+                    System.out.println("Customer from waiting list added: " + nextCustomer.getFirstName());
+                }
+            }
         } else {
             System.out.println("Customer not found in flight.");
         }
@@ -76,7 +82,6 @@ public class CustomerRep {
 
         return flightsForAirport;
     }
-
 
     // Get waiting list for flights
     public List<Customer> getWaitingList() {

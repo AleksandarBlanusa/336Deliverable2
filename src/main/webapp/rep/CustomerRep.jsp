@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="cs336.pkg.User" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,13 +51,36 @@
         <button type="submit" name="action" value="cancelReservation">Cancel Reservation</button>
     </form>
 
-    <h2>Reply to User Questions</h2>
-    <form action="CustomerRepServlet" method="post">
-        <label for="userQuestion">Question:</label><br>
-        <input type="text" id="userQuestion" name="userQuestion" required><br>
+    <!-- Reply to User Questions -->
+<h2>Reply to User Questions</h2>
 
-        <button type="submit" name="action" value="replyToUser">Reply</button>
-    </form>
+<table border="1">
+    <tr><th>Question ID</th><th>User ID</th><th>Flight ID</th><th>Question</th><th>Status</th></tr>
+<%
+    List<Map<String, Object>> pendingQuestions = (List<Map<String, Object>>) request.getAttribute("pendingQuestions");
+    if (pendingQuestions != null) {
+        for (Map<String, Object> question : pendingQuestions) {
+%>
+    <tr>
+        <td><%= question.get("question_id") %></td>
+        <td><%= question.get("user_id") %></td>
+        <td><%= question.get("flight_id") %></td>
+        <td><%= question.get("question_text") %></td>
+        <td><%= ((int)question.get("answered") == 0 ? "Pending" : "Answered") %></td>
+    </tr>
+<%
+        }
+    }
+%>
+</table>
+
+<!-- Form to reply -->
+<form action="CustomerRepServlet" method="post">
+    <label>Your Answer:</label><br>
+    <textarea name="answerText" rows="4" required></textarea><br>
+
+    <button type="submit" name="action" value="replyToUser">Submit Answer</button>
+</form>
 
     <h2>View Waiting List</h2>
     <table border="1">

@@ -3,14 +3,23 @@
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
   
-    <%
-        String username = (String) session.getAttribute("username");
-    	String firstname = (String) session.getAttribute("firstname");
-    	String role = (String) session.getAttribute("role");
-        if (username != null && firstname != null) {
-            out.println("Welcome " + firstname + ", You are an " + role);
-            out.println("<a href='../logout.jsp'>Log out</a>");
-        } else {
-            response.sendRedirect("../login.jsp"); 
-        }
-    %>
+<%
+    String username = (String) session.getAttribute("username");
+    String firstname = (String) session.getAttribute("firstname");
+    String role = (String) session.getAttribute("role");
+    if (username != null && firstname != null) {
+        out.println("Welcome " + firstname + ", You are an " + role + "<br><br>");
+        out.println("<a href='../logout.jsp'>Log out</a><br><br>");
+%>
+        <form action="../CustomerRep.jsp" method="get">
+            <button type="submit">Go to Customer Rep Page</button>
+        </form>
+        
+        <form action="../AircraftOps.jsp" method="get">
+            <button type="submit">Go to Customer Rep Page</button>
+        </form>
+<%
+    } else {
+        response.sendRedirect("../login.jsp"); 
+    }
+%>

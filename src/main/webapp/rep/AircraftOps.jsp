@@ -50,5 +50,9 @@
 
     <h2>Manage Airports and Flights</h2>
     <!-- Similar forms for managing airports and flights can be added here -->
+    
+    <form action="index.jsp" method="get">
+        <button type="submit">Go Back to Home</button>
+    </form>
 </body>
 </html>

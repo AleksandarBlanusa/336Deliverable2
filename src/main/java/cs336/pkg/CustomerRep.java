@@ -14,7 +14,7 @@ public class CustomerRep {
     // Make flight reservation
     public boolean makeReservation(Flight flight, User user) {
         if (flight.addUser(user)) {
-            System.out.println("Reservation made for " + user.getFirstName() + " on Flight ID: " + flight.getFlightId());
+            System.out.println("Reservation made for " + user.getFullName() + " on Flight ID: " + flight.getFlightId());
             return true;
         } else {
             System.out.println("Flight is fully booked. Adding to waiting list...");
@@ -28,6 +28,7 @@ public class CustomerRep {
         waitingList.add(user);
     }
 
+
     // Edit reservation
     public void editReservation(Flight flight, User oldUser, User newUser) {
         List<User> users = flight.getUsers();
@@ -35,7 +36,7 @@ public class CustomerRep {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getUserId() == oldUser.getUserId()) {
                 users.set(i, newUser);
-                System.out.println("Reservation updated for User ID: " + oldUser.getUserId());
+                System.out.println("Reservation updated for Customer ID: " + oldUser.getUserId());
                 return;
             }
         }
@@ -45,12 +46,12 @@ public class CustomerRep {
     // Cancel reservation
     public void cancelReservation(Flight flight, User user) {
         if (flight.getUsers().remove(user)) {
-            System.out.println("Reservation cancelled for User ID: " + user.getUserId());
-            // Check if any users are waiting and move one to the flight
+            System.out.println("Reservation cancelled for Customer ID: " + user.getUserId());
+            // Check if any customers are waiting and move one to the flight
             if (!waitingList.isEmpty()) {
                 User nextUser = waitingList.remove(0); // Get the first user in the waiting list
                 if (flight.addUser(nextUser)) {
-                    System.out.println("User from waiting list added: " + nextUser.getFirstName());
+                    System.out.println("User from waiting list added: " + nextUser.getFullName());
                 }
             }
         } else {

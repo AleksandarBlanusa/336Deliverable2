@@ -173,30 +173,58 @@
 
 <!-- Flight: Add -->
 <h2>Add Flight</h2>
-<form action="AircraftOps.jsp" method="post">
+<form method="post">
     <input type="hidden" name="action" value="addFlight">
+
     <label>Airline Code:</label><br>
-    <input type="text" name="airlineCode" required><br>
+    <select name="airlineCode" required>
+        <option value="AA">American Airlines</option>
+        <option value="DL">Delta</option>
+        <option value="EK">Emirates</option>
+        <option value="UA">United</option>
+        <option value="WN">Southwest</option>
+    </select><br>
+
     <label>Stops:</label><br>
     <input type="number" name="stops" required><br>
-    <label>Departure Time (YYYY-MM-DDTHH:MM):</label><br>
+
+    <label>Departure Time:</label><br>
     <input type="datetime-local" name="departureTime" required><br>
-    <label>Arrival Time (YYYY-MM-DDTHH:MM):</label><br>
+
+    <label>Arrival Time:</label><br>
     <input type="datetime-local" name="arrivalTime" required><br>
+
     <label>Duration (mins):</label><br>
     <input type="number" name="duration" required><br>
+
     <label>Origin Airport Code:</label><br>
-    <input type="text" name="originCode" required><br>
+    <select name="originCode" required>
+        <option value="BOS">Boston</option>
+        <option value="EWR">Newark</option>
+        <option value="ORD">Chicago</option>
+        <option value="RDU">Raleigh</option>
+    </select><br>
+
     <label>Destination Airport Code:</label><br>
-    <input type="text" name="destCode" required><br>
+    <select name="destCode" required>
+        <option value="BOS">Boston</option>
+        <option value="EWR">Newark</option>
+        <option value="ORD">Chicago</option>
+        <option value="RDU">Raleigh</option>
+    </select><br>
+
     <label>Available Seats:</label><br>
     <input type="number" name="availableSeats" required><br>
+
     <label>Total Seats:</label><br>
     <input type="number" name="totalSeats" required><br>
+
     <label>Price ($):</label><br>
     <input type="number" name="price" step="0.01" required><br>
+
     <button type="submit">Add Flight</button>
 </form>
+
 
 <!-- Back Button -->
 <h2>Manage Airports and Flights</h2>

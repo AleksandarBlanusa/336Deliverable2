@@ -132,6 +132,36 @@ INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:0
 UNLOCK TABLES;
 
 --
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `user_id` int NOT NULL AUTO_INCREMENT,
+  `firstname` varchar(50) DEFAULT NULL,
+  `lastname` varchar(50) DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `password` varchar(50) DEFAULT NULL,
+  `role` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Dev','Patel','test','test@gmail.com','test','customer'),(2,'admin','admin','admin','admin@gmail.com','admin','admin'),(3,'Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),(4,'Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),(5,'Alek','test','Alek','test3@gmail.com','test','customer');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
 -- Table structure for table `questions`
 --
 
@@ -189,35 +219,6 @@ LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
 INSERT INTO `reservations` VALUES (1,1,2,'first','reserved','2025-04-28 23:20:27'),(2,5,2,'business','reserved','2025-04-28 23:21:22'),(3,3,3,'economy','reserved','2025-04-28 23:22:01');
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `user_id` int NOT NULL AUTO_INCREMENT,
-  `firstname` varchar(50) DEFAULT NULL,
-  `lastname` varchar(50) DEFAULT NULL,
-  `username` varchar(50) DEFAULT NULL,
-  `email` varchar(50) DEFAULT NULL,
-  `password` varchar(50) DEFAULT NULL,
-  `role` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Dev','Patel','test','test@gmail.com','test','customer'),(2,'admin','admin','admin','admin@gmail.com','admin','admin'),(3,'Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),(4,'Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),(5,'Alek','test','Alek','test3@gmail.com','test','customer');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

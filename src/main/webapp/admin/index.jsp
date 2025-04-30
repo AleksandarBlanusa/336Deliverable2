@@ -104,6 +104,24 @@
 	</div>
 	
 	<div>
+	<h1>Revenue</h1>
+	
+	<h3>Revenue by Flight (all flights)</h3>
+	<form method="post" action="./req/flightrev.jsp">
+	<input type="submit" value="Get Flight Revenue">
+	</form>
+	
+	<h3>Revenue by Airline (all airlines)</h3>
+	<form method="post" action="./req/airlinerev.jsp">
+	<input type="submit" value="Get Airline Revenue">
+	</form>
+	
+	<h3>Revenue by Customer (all customers)</h3>
+	<form method="post" action="./req/customerrev.jsp">
+	<input type="submit" value="Get Customer Revenue">
+	</form>
+	</div>
+	<div>
 	<h1>Reports</h1>
 	<h3>Most Active Flights</h3>
 	<form method="post" action="./req/activeflights.jsp">

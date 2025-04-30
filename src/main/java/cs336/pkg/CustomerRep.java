@@ -69,7 +69,6 @@ public class CustomerRep {
                 int rowsUpdated = cancelStmt.executeUpdate();
 
                 if (rowsUpdated > 0) {
-                    // Step 2: Increase available seats
                     try (PreparedStatement updateStmt = conn.prepareStatement(incrementSeatsQuery)) {
                         updateStmt.setInt(1, flightId);
                         updateStmt.executeUpdate();
@@ -77,7 +76,6 @@ public class CustomerRep {
 
                     System.out.println("Reservation cancelled and seat released for user_id=" + userId);
 
-                    // Step 3: Promote a user from waiting list (optional)
                     promoteFromWaitingList(conn, flightId);
 
                 } else {
@@ -187,8 +185,6 @@ public class CustomerRep {
         return flightIds;
     }
 
-    
-    
     // Get users currently on the waiting list for a flight
     public List<Integer> getWaitingList(int flightId) {
         Connection conn = db.getConnection();

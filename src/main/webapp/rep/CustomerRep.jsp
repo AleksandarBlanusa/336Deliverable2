@@ -22,7 +22,8 @@
             int flightId = Integer.parseInt(request.getParameter("flightId"));
             int userId = Integer.parseInt(request.getParameter("cancelUserId"));
             rep.cancelReservation(flightId, userId);
-            request.setAttribute("message", "Reservation canceled successfully.");
+            request.setAttribute("message", "Reservation canceled and seat released.");
+
 
         } else if ("replyToUser".equals(action)) {
             int questionId = Integer.parseInt(request.getParameter("questionId"));

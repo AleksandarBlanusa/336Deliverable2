@@ -23,26 +23,26 @@
 		<form method = "POST" action = "./req/add.jsp">
 		
 			<label for="firstname">First Name: </label>
-			<input type="text" name="firstname" id="firstname" placeholder="First Name">
+			<input type="text" name="firstname" id="firstname" placeholder="First Name" required>
 			<br>
 			
 			<label for="lastname">Last Name: </label>
-			<input type="text" name="lastname" id="lastname" placeholder="Last Name">
+			<input type="text" name="lastname" id="lastname" placeholder="Last Name" required>
 			<br>
 			
 			<label for="username">Username: </label>
-			<input type="text" name="username" id="username" placeholder="Username">
+			<input type="text" name="username" id="username" placeholder="Username" required>
 			<br>
 			
 			<label for="email">Email: </label>
-			<input type="text" name="email" id="email" placeholder="Email">
+			<input type="text" name="email" id="email" placeholder="Email" required>
 			<br>
 			
 			<label for="password">Password: </label>
-			<input type="text" name="password" id="password" placeholder="Password">
+			<input type="text" name="password" id="password" placeholder="Password" required>
 			<br>
 			
-			<input type="radio" name="user" id="customer_rep" value="customer_rep">
+			<input type="radio" name="user" id="customer_rep" value="customer_rep" required>
 			<label for="employee">Customer Rep</label>
 			
 			<input type="radio" name="user" id="customer" value="customer">

@@ -87,9 +87,20 @@
 	</div>
 	<div>
 	<h1>Reservations</h1>
-	<h2>By Flight Number</h2>
+	<h2>By Flight ID</h2>
+	<form method="post" action="./req/res_flightid.jsp">
+	<label for="firstname">Flight ID: </label>
+	<input type="text" name="flightid" id="flightid" placeholder="Enter Flight ID" required>
+	<input type="submit" value="submit">
+	</form>
 	<h2>By Customer Name</h2>
-	
+	<form method="post" action="./req/res_custname.jsp">
+	<label for="firstname">First Name: </label>
+	<input type="text" name="firstname" id="firstname" placeholder="Enter Customer First Name" required><br/>
+	<label for="lastname">Last Name: </label>
+	<input type="text" name="lastname" id="lastname" placeholder="Enter Customer Last Name" required><br/>
+	<input type="submit" value="submit">
+	</form>
 	</div>
 </body>
 </html>

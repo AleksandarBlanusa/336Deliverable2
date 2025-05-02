@@ -106,17 +106,17 @@
 	<div>
 	<h1>Revenue</h1>
 	
-	<h3>Revenue by Flight (all flights)</h3>
+	<h3>Revenue by Flight</h3>
 	<form method="post" action="./req/flightrev.jsp">
 	<input type="submit" value="Get Flight Revenue">
 	</form>
 	
-	<h3>Revenue by Airline (all airlines)</h3>
+	<h3>Revenue by Airline</h3>
 	<form method="post" action="./req/airlinerev.jsp">
 	<input type="submit" value="Get Airline Revenue">
 	</form>
 	
-	<h3>Revenue by Customer (all customers)</h3>
+	<h3>Revenue by Customer</h3>
 	<form method="post" action="./req/customerrev.jsp">
 	<input type="submit" value="Get Customer Revenue">
 	</form>
@@ -127,6 +127,27 @@
 	<form method="post" action="./req/activeflights.jsp">
 	<input type="submit" value="Get Most Active Flights">
 	</form>
+	
+	<h3>Sales Report by Month</h3>
+	<form method="post" action="./req/salesreport.jsp">
+	<label for="month">Choose a Month:</label>
+	<select id="month" name="month">
+	  <option value="January">January</option>
+	  <option value="February">February</option>
+	  <option value="March">March</option>
+	  <option value="April">April</option>
+	  <option value="May">May</option>
+	  <option value="June">June</option>
+	  <option value="July">July</option>
+	  <option value="August">August</option>
+	  <option value="September">September</option>
+	  <option value="October">October</option>
+	  <option value="November">November</option>
+	  <option value="December">December</option>
+	</select>
+	<input type="submit" value="Get Sales Report">
+	</form>
 	</div>
+	
 </body>
 </html>

@@ -4,7 +4,17 @@
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 
 <a href='../index.jsp'>Go Back</a><br>
-<p>Flight Revenue Ordered by Revenue</p>
+<p>Flight Revenue Ordered by Most to Least Revenue</p>
+
+<form method="get" action="flightrev.jsp">
+    <label for="flight_id">Search by Flight ID:</label>
+    <input type="text" name="flight_id" id="flight_id" placeholder="Enter Flight ID"/>
+    <input type="submit" value="submit" />
+    
+</form>
+<form method="get" action="flightrev.jsp">
+    <input type="submit" value="reset" />
+</form>
 
 <%
 	String user = (String) session.getAttribute("username");
@@ -14,60 +24,67 @@
 		return;
 	}
 	
-
+	String flightid = request.getParameter("flight_id");
+	
 	try{
 		
 		ApplicationDB db = new ApplicationDB();	
 		Connection con = db.getConnection();	
 		
-        String query = "SELECT *, (total_seats - available_seats) AS tickets_sold, (total_seats*price) as revenue FROM flights join aircrafts on flights.aircraft_id = aircrafts.aircraft_id ORDER BY revenue DESC";
-        
-     	PreparedStatement pst = con.prepareStatement(query);
-	    ResultSet rs = pst.executeQuery();
-
-	    	out.println ("<table>");
-			out.println("<tr>");
-			out.println("<td>Flight Id</td>");	
-			out.println("<td>Airline Id</td>");	
-			out.println("<td>Takeoff Time</td>");
-			out.println("<td>Landing Time</td>");
-			out.println("<td>Duration (Minutes)</td>");
-			out.println("<td>Route</td>");
-			out.println("<td>Tickets Sold</td>");
-			out.println("<td>Revenue</td>");
-			out.println("</tr>");
-	    	
-			while(rs.next()){
-				
-				String flight_id = rs.getString("flight_id");
-				String airline_id = rs.getString("airline_id");
-				String ttime = rs.getString("takeoff_time");
-				String ltime = rs.getString("landing_time");
-				String duration = rs.getString("duration");
-				String origin = rs.getString("origin_airport_code");
-				String des = rs.getString("destination_airport_code");
-				String tik_sold = rs.getString("tickets_sold");
-				String rev = rs.getString("revenue");
-
-	            out.println("<tr>");
-	            out.println("<td>" + flight_id + "</td>");
-	            out.println("<td>" + airline_id + "</td>");
-	            out.println("<td>" + ttime + "</td>");
-	            out.println("<td>" + ltime + "</td>");
-	            out.println("<td>" + duration + "</td>");
-	            out.println("<td>" + origin + "->" + des + "</td>");
-	            out.println("<td>" + tik_sold + "</td>");
-	            out.println("<td>" + rev + "</td>");
-	            out.println("</tr>");
-	            
-	            
+		String query = "SELECT *, (total_seats - available_seats) AS tickets_sold, ((total_seats - available_seats)*price) as revenue FROM flights join aircrafts on flights.aircraft_id = aircrafts.aircraft_id ORDER BY revenue DESC";
+	    PreparedStatement pst = con.prepareStatement(query);
+	    
+		if (flightid != null){
+	        query = "SELECT *, (total_seats - available_seats) AS tickets_sold, ((total_seats - available_seats)*price) as revenue FROM flights join aircrafts on flights.aircraft_id = aircrafts.aircraft_id where flight_id = ?";
+	     	pst = con.prepareStatement(query);
+	     	pst.setString(1, flightid);
 		}
-			
-		out.println("</table>");
 		
-	    rs.close();
-	    pst.close();
-	    con.close();
+		    ResultSet rs = pst.executeQuery();
+	
+		    	out.println ("<table>");
+				out.println("<tr>");
+				out.println("<td>Flight Id</td>");	
+				out.println("<td>Airline Id</td>");	
+				out.println("<td>Takeoff Time</td>");
+				out.println("<td>Landing Time</td>");
+				out.println("<td>Duration (Minutes)</td>");
+				out.println("<td>Route</td>");
+				out.println("<td>Tickets Sold</td>");
+				out.println("<td>Revenue</td>");
+				out.println("</tr>");
+		    	
+				while(rs.next()){
+					
+					String flight_id = rs.getString("flight_id");
+					String airline_id = rs.getString("airline_id");
+					String ttime = rs.getString("takeoff_time");
+					String ltime = rs.getString("landing_time");
+					String duration = rs.getString("duration");
+					String origin = rs.getString("origin_airport_code");
+					String des = rs.getString("destination_airport_code");
+					String tik_sold = rs.getString("tickets_sold");
+					String rev = rs.getString("revenue");
+	
+		            out.println("<tr>");
+		            out.println("<td>" + flight_id + "</td>");
+		            out.println("<td>" + airline_id + "</td>");
+		            out.println("<td>" + ttime + "</td>");
+		            out.println("<td>" + ltime + "</td>");
+		            out.println("<td>" + duration + "</td>");
+		            out.println("<td>" + origin + "->" + des + "</td>");
+		            out.println("<td>" + tik_sold + "</td>");
+		            out.println("<td>" + rev + "</td>");
+		            out.println("</tr>");
+		            
+		            
+			}
+				
+			out.println("</table>");
+			
+		    rs.close();
+		    pst.close();
+	    	con.close();
 		
 	} catch (Exception e){
 		out.println("Unable to connect to DB. Please try again later.");

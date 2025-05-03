@@ -18,7 +18,7 @@
 #### 🧑‍💼 Customer
 
 - **Username:** `Neelesh`
-- **Password:** `Test`
+- **Password:** `test`
 
 - **Username:** `Alek`
 - **Password:** `test`

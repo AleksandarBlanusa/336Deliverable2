@@ -60,7 +60,7 @@
             <div class="form-group">
                 <label for="toAirport">Arrival Airport:</label>
                 <input type="text" id="toAirport" name="toAirport" 
-                       placeholder="3-letter code (e.g. LAX)" required>
+                       placeholder="3-letter code (e.g. EWR)" required>
             </div>
 
             <!-- Date Selection -->

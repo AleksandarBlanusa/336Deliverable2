@@ -190,6 +190,7 @@
                     <option value="DL" <%= airlines != null && airlines.contains("DL") ? "selected" : "" %>>Delta</option>
                     <option value="UA" <%= airlines != null && airlines.contains("UA") ? "selected" : "" %>>United</option>
                     <option value="WN" <%= airlines != null && airlines.contains("WN") ? "selected" : "" %>>Southwest</option>
+                    <option value="EK" <%= airlines != null && airlines.contains("EK") ? "Selected" : "" %>>Emirates</option>
                 </select>
             </div>
             

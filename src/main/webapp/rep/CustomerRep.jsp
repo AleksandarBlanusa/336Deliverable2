@@ -1,213 +1,169 @@
-package cs336.pkg;
+<%@ page import="java.sql.*, java.util.*, cs336.pkg.CustomerRep, cs336.pkg.User" %>
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+<%
+    String action = request.getParameter("action");
+    CustomerRep rep = new CustomerRep();  // Use your CustomerRep class
 
-public class CustomerRep {
-
-    private ApplicationDB db = new ApplicationDB();  // Reuse your ApplicationDB class
-
-    // Make a flight reservation
-    public boolean makeReservation(int flightId, int userId, String seatClass) {
-        String checkSeatsQuery = "SELECT available_seats FROM flights WHERE flight_id = ?";
-        String reserveQuery = "INSERT INTO reservations (user_id, flight_id, seat_class, status) VALUES (?, ?, ?, 'reserved')";
-        String updateSeatsQuery = "UPDATE flights SET available_seats = available_seats - 1 WHERE flight_id = ?";
-
-        try (Connection conn = new ApplicationDB().getConnection()) {
-
-            // Step 1: Check available seats
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSeatsQuery)) {
-                checkStmt.setInt(1, flightId);
-                ResultSet rs = checkStmt.executeQuery();
-
-                if (rs.next()) {
-                    int availableSeats = rs.getInt("available_seats");
-
-                    if (availableSeats > 0) {
-                        // Step 2: Insert reservation
-                        try (PreparedStatement reserveStmt = conn.prepareStatement(reserveQuery)) {
-                            reserveStmt.setInt(1, userId);
-                            reserveStmt.setInt(2, flightId);
-                            reserveStmt.setString(3, seatClass);
-                            reserveStmt.executeUpdate();
-                        }
-
-                        // Step 3: Decrease available seats
-                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSeatsQuery)) {
-                            updateStmt.setInt(1, flightId);
-                            updateStmt.executeUpdate();
-                        }
-
-                        System.out.println("Reservation made and seat count updated.");
-                        return true;
-                    } else {
-                        System.out.println("No more seats available.");
-                        return false;
-                    }
-                } else {
-                    System.out.println("Flight not found.");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    // Cancel a reservation
-    public void cancelReservation(int flightId, int userId) {
-        String cancelQuery = "UPDATE reservations SET status = 'cancelled' WHERE flight_id = ? AND user_id = ? AND status = 'reserved'";
-        String incrementSeatsQuery = "UPDATE flights SET available_seats = available_seats + 1 WHERE flight_id = ?";
-
-        try (Connection conn = new ApplicationDB().getConnection()) {
-            // Step 1: Cancel the reservation
-            try (PreparedStatement cancelStmt = conn.prepareStatement(cancelQuery)) {
-                cancelStmt.setInt(1, flightId);
-                cancelStmt.setInt(2, userId);
-                int rowsUpdated = cancelStmt.executeUpdate();
-
-                if (rowsUpdated > 0) {
-                    // Step 2: Increase available seats
-                    try (PreparedStatement updateStmt = conn.prepareStatement(incrementSeatsQuery)) {
-                        updateStmt.setInt(1, flightId);
-                        updateStmt.executeUpdate();
-                    }
-
-                    System.out.println("Reservation cancelled and seat released for user_id=" + userId);
-
-                    // Step 3: Promote a user from waiting list (optional)
-                    promoteFromWaitingList(conn, flightId);
-
-                } else {
-                    System.out.println("No active reservation found to cancel.");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    if (action != null) {
+    	if ("makeReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int userId = Integer.parseInt(request.getParameter("userId"));
+    	    boolean success = rep.makeReservation(flightId, userId, "economy");
+    	    request.setAttribute("message", success ? "Reservation made successfully!" : "Flight full. Added to waiting list.");
+    	    if (success) {
+    	        response.sendRedirect("ListReservations.jsp");
+    	        return;
+    	    }
+    	    
+    	} else if ("editReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int oldUserId = Integer.parseInt(request.getParameter("oldUserId"));
+    	    int newUserId = Integer.parseInt(request.getParameter("newUserId"));
+    	    rep.editReservation(flightId, oldUserId, newUserId);
+    	    request.setAttribute("message", "Reservation updated successfully.");
+    	    response.sendRedirect("ListReservations.jsp");
+    	    return;
+    	    
+    	} else if ("cancelReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int userId = Integer.parseInt(request.getParameter("cancelUserId"));
+    	    rep.cancelReservation(flightId, userId);
+    	    request.setAttribute("message", "Reservation canceled and seat released.");
+    	    response.sendRedirect("ListReservations.jsp");
+    	    return;
+    	    
+    	} else if ("replyToUser".equals(action)) {
+            int questionId = Integer.parseInt(request.getParameter("questionId"));
+            String answerText = request.getParameter("answerText");
+            rep.replyToUser(questionId, answerText);
+            request.setAttribute("message", "Replied to user question successfully.");
         }
     }
+%>
 
-    // Promote first user from waiting list to reservation
-    private void promoteFromWaitingList(Connection conn, int flightId) throws SQLException {
-        String nextUserQuery = "SELECT user_id FROM waiting_list WHERE flight_id = ? ORDER BY added_date ASC LIMIT 1";
-        try (PreparedStatement nextStmt = conn.prepareStatement(nextUserQuery)) {
-            nextStmt.setInt(1, flightId);
-            ResultSet rs = nextStmt.executeQuery();
-            if (rs.next()) {
-                int nextUserId = rs.getInt("user_id");
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Reservations</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        form { margin-bottom: 20px; }
+        input, textarea, select { padding: 10px; width: 300px; margin-bottom: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
-                String insertReservation = "INSERT INTO reservations (user_id, flight_id, seat_class, status) VALUES (?, ?, 'economy', 'reserved')";
-                try (PreparedStatement insertStmt = conn.prepareStatement(insertReservation)) {
-                    insertStmt.setInt(1, nextUserId);
-                    insertStmt.setInt(2, flightId);
-                    insertStmt.executeUpdate();
+
+	<h2>Navigation</h2>
+	<form action="ListReservations.jsp" method="get" style="display:inline;">
+    	<button type="submit">View All Reservations</button>
+	</form>
+
+	<form action="ListWaitinglist.jsp" method="get" style="display:inline;">
+    	<button type="submit">View Waiting List</button>
+	</form>
+
+
+    <h1>User Reservations</h1>
+
+    <!-- Display message if exists -->
+    <% if (request.getAttribute("message") != null) { %>
+        <p style="color: green;"><%= request.getAttribute("message") %></p>
+    <% } %>
+
+    <h2>Make Reservation</h2>
+    <form action="CustomerRep.jsp" method="post">
+        <label>Flight ID:</label><br>
+        <input type="number" name="flightId" required><br>
+
+        <label>User ID:</label><br>
+        <input type="number" name="userId" required><br>
+
+        <button type="submit" name="action" value="makeReservation">Make Reservation</button>
+    </form>
+
+    <h2>Edit Reservation</h2>
+    <form action="CustomerRep.jsp" method="post">
+        <label>Flight ID:</label><br>
+        <input type="number" name="flightId" required><br>
+
+        <label>Old User ID:</label><br>
+        <input type="number" name="oldUserId" required><br>
+
+        <label>New User ID:</label><br>
+        <input type="number" name="newUserId" required><br>
+
+        <button type="submit" name="action" value="editReservation">Edit Reservation</button>
+    </form>
+
+    <h2>Cancel Reservation</h2>
+    <form action="CustomerRep.jsp" method="post">
+        <label>Flight ID:</label><br>
+        <input type="number" name="flightId" required><br>
+
+        <label>User ID:</label><br>
+        <input type="number" name="cancelUserId" required><br>
+
+        <button type="submit" name="action" value="cancelReservation">Cancel Reservation</button>
+    </form>
+
+    <h2>Reply to User Questions</h2>
+
+    <table border="1">
+        <tr><th>Question ID</th><th>User ID</th><th>Flight ID</th><th>Question</th><th>Status</th></tr>
+        <% 
+            List<Map<String, Object>> pendingQuestions = (List<Map<String, Object>>) request.getAttribute("pendingQuestions");
+            if (pendingQuestions != null) {
+                for (Map<String, Object> question : pendingQuestions) {
+        %>
+            <tr>
+                <td><%= question.get("question_id") %></td>
+                <td><%= question.get("user_id") %></td>
+                <td><%= question.get("flight_id") %></td>
+                <td><%= question.get("question_text") %></td>
+                <td><%= ((int) question.get("answered") == 0 ? "Pending" : "Answered") %></td>
+            </tr>
+        <%  
                 }
+            } 
+        %>
+    </table>
 
-                String deleteWaitlist = "DELETE FROM waiting_list WHERE user_id = ? AND flight_id = ?";
-                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteWaitlist)) {
-                    deleteStmt.setInt(1, nextUserId);
-                    deleteStmt.setInt(2, flightId);
-                    deleteStmt.executeUpdate();
+    <!-- Form to reply -->
+    <form action="CustomerRep.jsp" method="post">
+        <label>Question ID:</label><br>
+        <input type="number" name="questionId" required><br>
+
+        <label>Your Answer:</label><br>
+        <textarea name="answerText" rows="4" required></textarea><br>
+
+        <button type="submit" name="action" value="replyToUser">Submit Answer</button>
+    </form>
+
+    <h2>View Waiting List</h2>
+    <table border="1">
+        <tr><th>User ID</th><th>Name</th></tr>
+        <% 
+            List<User> waitingList = (List<User>) request.getAttribute("waitingList");
+            if (waitingList != null) {
+                for (User user : waitingList) {
+        %>
+                    <tr>
+                        <td><%= user.getUserId() %></td>
+                        <td><%= user.getFullName() %></td>
+                    </tr>
+        <%  
                 }
+            } 
+        %>
+    </table>
 
-                System.out.println("Promoted user_id=" + nextUserId + " from waiting list.");
-            }
-        }
-    }
+    <form action="index.jsp" method="get">
+        <button type="submit">Go Back to Home</button>
+    </form>
 
-    // Edit an existing reservation to a different user
-    public void editReservation(int flightId, int oldUserId, int newUserId) {
-        Connection conn = db.getConnection();
-        if (conn == null) return;
-        try {
-            String updateQuery = "UPDATE reservations SET user_id = ? WHERE flight_id = ? AND user_id = ? AND status = 'reserved'";
-            try (PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-                stmt.setInt(1, newUserId);
-                stmt.setInt(2, flightId);
-                stmt.setInt(3, oldUserId);
-                int updatedRows = stmt.executeUpdate();
-                if (updatedRows > 0) {
-                    System.out.println("Reservation updated: old_user_id=" + oldUserId + " -> new_user_id=" + newUserId);
-                } else {
-                    System.out.println("No reservation found to update.");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            db.closeConnection(conn);
-        }
-    }
-
-    // Reply to a user question
-    public void replyToUser(int questionId, String answerText) {
-        Connection conn = db.getConnection();
-        if (conn == null) return;
-        try {
-            String replyQuery = "UPDATE questions SET answer_text = ?, answered = 1 WHERE question_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(replyQuery)) {
-                stmt.setString(1, answerText);
-                stmt.setInt(2, questionId);
-                int updated = stmt.executeUpdate();
-                if (updated > 0) {
-                    System.out.println("Answered question_id=" + questionId);
-                } else {
-                    System.out.println("Question not found to answer.");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            db.closeConnection(conn);
-        }
-    }
-
-    // Get list of flights by airport code
-    public List<Integer> getFlightsByAirport(String airportCode) {
-        Connection conn = db.getConnection();
-        List<Integer> flightIds = new ArrayList<>();
-        if (conn == null) return flightIds;
-        try {
-            String query = "SELECT flight_id FROM flights WHERE origin_airport_code = ? OR destination_airport_code = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, airportCode);
-                stmt.setString(2, airportCode);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    flightIds.add(rs.getInt("flight_id"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            db.closeConnection(conn);
-        }
-        return flightIds;
-    }
-
-    
-    
-    // Get users currently on the waiting list for a flight
-    public List<Integer> getWaitingList(int flightId) {
-        Connection conn = db.getConnection();
-        List<Integer> waitingUsers = new ArrayList<>();
-        if (conn == null) return waitingUsers;
-        try {
-            String query = "SELECT user_id FROM waiting_list WHERE flight_id = ? ORDER BY added_date ASC";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setInt(1, flightId);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    waitingUsers.add(rs.getInt("user_id"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            db.closeConnection(conn);
-        }
-        return waitingUsers;
-    }
-}
+</body>
+</html>

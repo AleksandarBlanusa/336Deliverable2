@@ -2,7 +2,9 @@ package cs336.pkg;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomerRep {
 
@@ -13,48 +15,54 @@ public class CustomerRep {
         String checkSeatsQuery = "SELECT available_seats FROM flights WHERE flight_id = ?";
         String reserveQuery = "INSERT INTO reservations (user_id, flight_id, seat_class, status) VALUES (?, ?, ?, 'reserved')";
         String updateSeatsQuery = "UPDATE flights SET available_seats = available_seats - 1 WHERE flight_id = ?";
+        String waitlistInsertQuery = "INSERT INTO waiting_list (user_id, flight_id) VALUES (?, ?)";
 
-        try (Connection conn = new ApplicationDB().getConnection()) {
+        try (Connection conn = db.getConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSeatsQuery)) {
 
-            // Step 1: Check available seats
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSeatsQuery)) {
-                checkStmt.setInt(1, flightId);
-                ResultSet rs = checkStmt.executeQuery();
-
+            checkStmt.setInt(1, flightId);
+            try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next()) {
                     int availableSeats = rs.getInt("available_seats");
 
                     if (availableSeats > 0) {
-                        // Step 2: Insert reservation
-                        try (PreparedStatement reserveStmt = conn.prepareStatement(reserveQuery)) {
+                        // Reserve the flight
+                        try (PreparedStatement reserveStmt = conn.prepareStatement(reserveQuery);
+                             PreparedStatement updateStmt = conn.prepareStatement(updateSeatsQuery)) {
+
                             reserveStmt.setInt(1, userId);
                             reserveStmt.setInt(2, flightId);
                             reserveStmt.setString(3, seatClass);
                             reserveStmt.executeUpdate();
-                        }
 
-                        // Step 3: Decrease available seats
-                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSeatsQuery)) {
                             updateStmt.setInt(1, flightId);
                             updateStmt.executeUpdate();
                         }
 
-                        System.out.println("Reservation made and seat count updated.");
+                        System.out.println("Reservation made successfully.");
                         return true;
+
                     } else {
-                        System.out.println("No more seats available.");
+                        // Add to waiting list
+                        try (PreparedStatement waitlistStmt = conn.prepareStatement(waitlistInsertQuery)) {
+                            waitlistStmt.setInt(1, userId);
+                            waitlistStmt.setInt(2, flightId);
+                            waitlistStmt.executeUpdate();
+                        }
+
+                        System.out.println("No seats available. Added to waiting list.");
                         return false;
                     }
-                } else {
-                    System.out.println("Flight not found.");
                 }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return false;
     }
+
 
     // Cancel a reservation
     public void cancelReservation(int flightId, int userId) {
@@ -69,6 +77,7 @@ public class CustomerRep {
                 int rowsUpdated = cancelStmt.executeUpdate();
 
                 if (rowsUpdated > 0) {
+                    // Step 2: Increase available seats
                     try (PreparedStatement updateStmt = conn.prepareStatement(incrementSeatsQuery)) {
                         updateStmt.setInt(1, flightId);
                         updateStmt.executeUpdate();
@@ -76,6 +85,7 @@ public class CustomerRep {
 
                     System.out.println("Reservation cancelled and seat released for user_id=" + userId);
 
+                    // Step 3: Promote a user from waiting list (optional)
                     promoteFromWaitingList(conn, flightId);
 
                 } else {
@@ -185,25 +195,60 @@ public class CustomerRep {
         return flightIds;
     }
 
-    // Get users currently on the waiting list for a flight
-    public List<Integer> getWaitingList(int flightId) {
-        Connection conn = db.getConnection();
-        List<Integer> waitingUsers = new ArrayList<>();
-        if (conn == null) return waitingUsers;
-        try {
-            String query = "SELECT user_id FROM waiting_list WHERE flight_id = ? ORDER BY added_date ASC";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setInt(1, flightId);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    waitingUsers.add(rs.getInt("user_id"));
-                }
+    
+    
+    // Get all unanswered user questions
+    public List<Map<String, Object>> getPendingQuestions() {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String query = "SELECT * FROM questions WHERE answered = 0";
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("question_id", rs.getInt("question_id"));
+                row.put("user_id", rs.getInt("user_id"));
+                row.put("flight_id", rs.getInt("flight_id"));
+                row.put("question_text", rs.getString("question_text"));
+                row.put("answered", rs.getInt("answered"));
+                result.add(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            db.closeConnection(conn);
         }
-        return waitingUsers;
+
+        return result;
     }
+
+    // Get full user info for users in waiting list (for display)
+    public List<User> getWaitingList() {
+        List<User> list = new ArrayList<>();
+        String query = "SELECT u.user_id, u.firstname, u.lastname FROM users u " +
+                       "JOIN waiting_list w ON u.user_id = w.user_id";
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setFirstname(rs.getString("firstname"));
+                u.setLastname(rs.getString("lastname"));
+                list.add(u);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    
+
+
+
 }

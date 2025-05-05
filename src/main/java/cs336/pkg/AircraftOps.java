@@ -1,9 +1,8 @@
 package cs336.pkg;
 
-import java.sql.Timestamp;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AircraftOps {
 
@@ -58,6 +57,25 @@ public class AircraftOps {
         }
     }
 
+    // Get all aircrafts
+    public List<Aircraft> getAllAircrafts(Connection conn) throws SQLException {
+        List<Aircraft> aircraftList = new ArrayList<>();
+        String query = "SELECT aircraft_id, model, capacity FROM aircrafts";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("aircraft_id");
+                String model = rs.getString("model");
+                int capacity = rs.getInt("capacity");
+                Aircraft aircraft = new Aircraft(id, model, capacity);
+                aircraftList.add(aircraft);
+            }
+        }
+
+        return aircraftList;
+    }
+
     // Add new airport
     public void addAirport(Connection conn, Airport airport) throws SQLException {
         if (airport == null) {
@@ -65,10 +83,11 @@ public class AircraftOps {
             return;
         }
 
-        String query = "INSERT INTO airports (airport_code, city) VALUES (?, ?)";
+        String query = "INSERT INTO airports (airport_code, city, state) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, airport.getAirportCode());
             stmt.setString(2, airport.getCity());
+            stmt.setString(3, airport.getState());
             stmt.executeUpdate();
             System.out.println("Airport added: " + airport);
         }
@@ -81,9 +100,10 @@ public class AircraftOps {
             return;
         }
 
-        String query = "UPDATE airports SET city = ?, WHERE airport_code = ?";
+        String query = "UPDATE airports SET city = ?, state = ? WHERE airport_code = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newAirport.getCity());
+            stmt.setString(2, newAirport.getState());
             stmt.setString(3, oldAirportCode);
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated > 0) {
@@ -107,7 +127,27 @@ public class AircraftOps {
             }
         }
     }
+    
+    public List<Airport> getAllAirports(Connection conn) throws SQLException {
+        List<Airport> airportList = new ArrayList<>();
+        String query = "SELECT airport_code, city, state FROM airports";
 
+        try (PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String code = rs.getString("airport_code");
+                String city = rs.getString("city");
+                String state = rs.getString("state");
+                Airport airport = new Airport(0, code, city, state);
+                airportList.add(airport);
+            }
+        }
+
+        return airportList;
+    }
+
+
+    // Add new flight
     public void addFlight(Connection conn, Flight flight) throws SQLException {
         if (flight == null) {
             System.out.println("Cannot add null flight.");
@@ -131,8 +171,6 @@ public class AircraftOps {
             System.out.println("Flight added: " + flight);
         }
     }
-
-
 
     // Edit existing flight
     public void editFlight(Connection conn, int flightId, Flight newFlight, Aircraft newAircraft) throws SQLException {
@@ -164,7 +202,6 @@ public class AircraftOps {
         }
     }
 
-
     // Delete flight
     public void deleteFlight(Connection conn, int flightId) throws SQLException {
         String query = "DELETE FROM flights WHERE flight_id = ?";
@@ -178,4 +215,83 @@ public class AircraftOps {
             }
         }
     }
+    
+    public List<Flight> getAllFlights(Connection conn) throws SQLException {
+        List<Flight> flightList = new ArrayList<>();
+        String query = "SELECT * FROM flights";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Flight f = new Flight();
+                f.setFlightId(rs.getInt("flight_id"));
+                f.setAirlineCode(rs.getString("airline_id"));
+                f.setStops(rs.getInt("stops"));
+                f.setDepartureTime(rs.getTimestamp("takeoff_time").toLocalDateTime());
+                f.setArrivalTime(rs.getTimestamp("landing_time").toLocalDateTime());
+                f.setDuration(rs.getInt("duration"));
+                f.setDepartureAirportCode(rs.getString("origin_airport_code"));
+                f.setArrivalAirportCode(rs.getString("destination_airport_code"));
+                f.setAvailableSeats(rs.getInt("available_seats"));
+                f.setTotalSeats(rs.getInt("total_seats"));
+                f.setBasePrice(rs.getBigDecimal("price"));
+                flightList.add(f);
+            }
+        }
+
+        return flightList;
+    }
+    
+    public List<Flight> getDepartingFlights(Connection conn, String airportCode) throws SQLException {
+        List<Flight> flights = new ArrayList<>();
+        String query = "SELECT * FROM flights WHERE origin_airport_code = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, airportCode);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Flight f = new Flight();
+                    f.setFlightId(rs.getInt("flight_id"));
+                    f.setAirlineCode(rs.getString("airline_id"));
+                    f.setDepartureAirportCode(rs.getString("origin_airport_code"));
+                    f.setArrivalAirportCode(rs.getString("destination_airport_code"));
+                    f.setDepartureTime(rs.getTimestamp("takeoff_time").toLocalDateTime());
+                    f.setArrivalTime(rs.getTimestamp("landing_time").toLocalDateTime());
+                    f.setDuration(rs.getInt("duration"));
+                    f.setStops(rs.getInt("stops"));
+                    flights.add(f);
+                }
+            }
+        }
+
+        return flights;
+    }
+
+    public List<Flight> getArrivingFlights(Connection conn, String airportCode) throws SQLException {
+        List<Flight> flights = new ArrayList<>();
+        String query = "SELECT * FROM flights WHERE destination_airport_code = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, airportCode);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Flight f = new Flight();
+                    f.setFlightId(rs.getInt("flight_id"));
+                    f.setAirlineCode(rs.getString("airline_id"));
+                    f.setDepartureAirportCode(rs.getString("origin_airport_code"));
+                    f.setArrivalAirportCode(rs.getString("destination_airport_code"));
+                    f.setDepartureTime(rs.getTimestamp("takeoff_time").toLocalDateTime());
+                    f.setArrivalTime(rs.getTimestamp("landing_time").toLocalDateTime());
+                    f.setDuration(rs.getInt("duration"));
+                    f.setStops(rs.getInt("stops"));
+                    flights.add(f);
+                }
+            }
+        }
+
+        return flights;
+    }
+
+
 }

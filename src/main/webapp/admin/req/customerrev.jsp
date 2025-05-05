@@ -4,8 +4,17 @@
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 
 <a href='../index.jsp'>Go Back</a><br>
-<p>Airline Revenue Ordered by Revenue</p>
+<p>Customer Revenue Ordered by Revenue. Users with 0.00 revenue don't show up here. Top row is the user with the most revenue</p>
 
+<form method="get" action="customerrev.jsp">
+    <label for="customerid">Search by Customer ID:</label>
+    <input type="text" name="customerid" id="customerid" placeholder="Enter Customer ID" />
+    <input type="submit" value="submit" />
+    
+</form>
+<form method="get" action="customerrev.jsp">
+    <input type="submit" value="reset" />
+</form>
 <%
 	String user = (String) session.getAttribute("username");
 	
@@ -14,33 +23,47 @@
 		return;
 	}
 	
-
+	String customerid = request.getParameter("customerid");
+	
 	try{
 		
 		ApplicationDB db = new ApplicationDB();	
 		Connection con = db.getConnection();	
 		
-        String query = "Select temp.airline, temp.airline_id, Sum(revenue) as rev from (SELECT f.airline_id, a.airline, (total_seats - available_seats) AS tickets_sold, (total_seats*price) as revenue FROM flights f join airline a on f.airline_id = a.airline_id ORDER BY revenue DESC) as temp group by temp.airline_id order by rev desc";
+        String query = "Select user_id, name, SUM(price) as rev, count(*) as num_res from (select * , CONCAT(firstname, ' ', lastname) as name from reservations r join users u using (user_id) join flights f using (flight_id) where status = 'reserved') as t group by user_id order by rev desc";
         
      	PreparedStatement pst = con.prepareStatement(query);
+     	
+     	if (customerid != null){
+     		query = "Select user_id, name, SUM(price) as rev, count(*) as num_res from (select * , CONCAT(firstname, ' ', lastname) as name from reservations r join users u using (user_id) join flights f using (flight_id) where status = 'reserved') as t where user_id = ? group by user_id order by rev desc";
+     		pst = con.prepareStatement(query);
+     		pst.setString(1, customerid);
+     	}
+     	
+     	
+     	
 	    ResultSet rs = pst.executeQuery();
 
 	    	out.println ("<table>");
 			out.println("<tr>");
-			out.println("<td>Airline</td>");	
-			out.println("<td>Airline Id</td>");	
+			out.println("<td>User ID</td>");	
+			out.println("<td>Name</td>");
+			out.println("<td># of Reservations</td>");	
 			out.println("<td>Revenue</td>");
+			
 			out.println("</tr>");
 	    	
 			while(rs.next()){
 				
-				String airline = rs.getString("airline");
-				String airline_id = rs.getString("airline_id");
+				String id = rs.getString("user_id");
+				String name = rs.getString("name");
 				String rev = rs.getString("rev");
+				String num_res = rs.getString("num_res");
 
 	            out.println("<tr>");
-	            out.println("<td>" + airline + "</td>");
-	            out.println("<td>" + airline_id + "</td>");
+	            out.println("<td>" + id + "</td>");
+	            out.println("<td>" + name + "</td>");
+	            out.println("<td>" + num_res + "</td>");
 	            out.println("<td>" + rev + "</td>");
 	            out.println("</tr>");
 	            

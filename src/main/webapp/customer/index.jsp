@@ -1,52 +1,122 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="cs336.pkg.*"%>
-<%@ page import="java.io.*,java.util.*,java.sql.*"%>
-<%@ page import="javax.servlet.http.*,javax.servlet.*" %>
-
-    <%
-        String username = (String) session.getAttribute("username");
-    	String firstname = (String) session.getAttribute("firstname");
-    	String role = (String) session.getAttribute("role");
-        if (username != null && firstname != null) {
-            out.println("Welcome " + firstname + ", You are an " + role);
-            out.println("<a href='../logout.jsp'>Log out</a>");
-        } else {
-            response.sendRedirect("../login.jsp"); 
-        }
-    %>
-    
-    <!DOCTYPE html>
-<html lang="en">
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Search</title>
+    <title>Customer Flight Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .search-container { 
+            max-width: 600px; 
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 150px; font-weight: bold; }
+        input[type="text"], input[type="date"], select {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0052a3; }
+        .flex-options { margin: 15px 0; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Search for Flights</h2>
-    <form action="searchFlights" method="POST">
-        <!-- Departure Airport -->
-        <label for="fromAirport">From Airport:</label>
-        <input type="text" id="fromAirport" name="fromAirport" required><br>
+    <div class="header">
+        <h1>Flight Search</h1>
+        <a href="../logout.jsp" style="color: #0066cc;">Logout</a>
+    </div>
 
-        <!-- Arrival Airport -->
-        <label for="toAirport">To Airport:</label>
-        <input type="text" id="toAirport" name="toAirport" required><br>
+    <div class="search-container">
+        <form action="SearchFlights.jsp" method="GET">
+            <!-- Route Information -->
+            <div class="form-group">
+                <label for="fromAirport">Departure Airport:</label>
+                <input type="text" id="fromAirport" name="fromAirport" 
+                       placeholder="3-letter code (e.g. ORD)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="toAirport">Arrival Airport:</label>
+                <input type="text" id="toAirport" name="toAirport" 
+                       placeholder="3-letter code (e.g. LAX)" required>
+            </div>
 
-        <!-- Departure Date -->
-        <label for="departureDate">Departure Date:</label>
-        <input type="date" id="departureDate" name="departureDate" required><br>
+            <!-- Date Selection -->
+            <div class="form-group">
+                <label for="departureDate">Departure Date:</label>
+                <input type="date" id="departureDate" name="departureDate" required>
+            </div>
 
-        <!-- Round-trip checkbox -->
-        <label for="isRoundTrip">Round Trip?</label>
-        <input type="checkbox" id="isRoundTrip" name="isRoundTrip"><br>
+            <!-- Trip Type -->
+            <div class="form-group">
+                <label>Trip Type:</label>
+                <div style="display: inline-block;">
+                    <input type="radio" id="oneWay" name="tripType" value="oneway" checked 
+                           onclick="document.getElementById('returnDateGroup').style.display='none'">
+                    <label for="oneWay" style="width: auto;">One Way</label>
+                    
+                    <input type="radio" id="roundTrip" name="tripType" value="roundtrip"
+                           onclick="document.getElementById('returnDateGroup').style.display='block'">
+                    <label for="roundTrip" style="width: auto;">Round Trip</label>
+                </div>
+            </div>
 
-        <!-- Return Date (only shown if round-trip is selected) -->
-        <label for="returnDate">Return Date:</label>
-        <input type="date" id="returnDate" name="returnDate"><br>
+            <!-- Return Date (hidden by default) -->
+            <div class="form-group" id="returnDateGroup" style="display: none;">
+                <label for="returnDate">Return Date:</label>
+                <input type="date" id="returnDate" name="returnDate">
+            </div>
 
-        <button type="submit">Search Flights</button>
-    </form>
+            <!-- Flexible Dates -->
+            <div class="flex-options">
+                <input type="checkbox" id="flexibleDates" name="flexibleDates">
+                <label for="flexibleDates" style="width: auto; font-weight: normal;">
+                    Show flights ±3 days from selected date
+                </label>
+            </div>
+
+            <button type="submit">Search Flights</button>
+        </form>
+    </div>
+
+    <script>
+        // Set default departure date to today
+        document.getElementById('departureDate').valueAsDate = new Date();
+        
+        // Set minimum date to today for both date fields
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('departureDate').min = today;
+        document.getElementById('returnDate').min = today;
+        
+        // Auto-set return date to 7 days after departure
+        document.getElementById('departureDate').addEventListener('change', function() {
+            const departureDate = new Date(this.value);
+            const returnDate = new Date(departureDate);
+            returnDate.setDate(returnDate.getDate() + 7);
+            document.getElementById('returnDate').valueAsDate = returnDate;
+        });
+    </script>
 </body>
 </html>
-    

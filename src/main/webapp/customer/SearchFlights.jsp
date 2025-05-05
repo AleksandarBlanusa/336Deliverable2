@@ -2,76 +2,269 @@
     pageEncoding="ISO-8859-1" import="cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
+<%@ page import="java.time.LocalDate,java.time.format.DateTimeFormatter" %>
 
 <%
-	String departureAirportCode = request.getParameter("fromAirport");
-	String arrivalAirportCode = request.getParameter("toAirport");
-	datetime departureDate = request.getParameter("departureDate");
-	checkbox roundTrip = request.getParameter("isRoundTrip");
-	datetime returnDate = request.getParameter("returnDate");
-	
-	try
-	{
-		if(departureAirport.isEmpty() || arrivalAirport.isEmpty() || departureDate.isEmpty() 
-				|| (roundTrip.isChecked() && returnDate.isEmpty()) 
-				|| (!roundTrip.isChecked() && !returnDate.isEmpty())) throw new SQLSyntaxErrorException();
-		
-		ApplicationDB db = new ApplicationDB();	
-		Connection con = db.getConnection();	
-		
-		//Find departure airport
-		String query = "select * from flights where origin_airport_code = ?";
-		
-		PreparedStatement pst = con.prepareStatement(query);
-		pst.setString(1,departureAirportCode);
-		
-		ResultSet rs = pst.executeQuery();
-		
-		if(rs.next())
-		{
-			out.println("Airport does not exist.");
-		}
-		
-		//Find arrival Airport
-		query = "select * from flights where destination_airport_code = ?";
-		
-		pst = con.prepareStatement(query);
-	    pst.setString(1, arrivalAirportCode);
-	    
-	    rs = pst.executeQuery();
-	    
-	    if(rs.next())
-	    {
-	    	out.println("Airport does not exist.");
-	    }
-	    
-	    //Find flight if not round trip
-	    if(!roundTrip.isChecked())
-	    {
-	    	query = "SELECT flight_id FROM flights ORDER BY origin_airport_code";
-	    	pst = con.prepareStatement(query);
-	    	rs = pst.executeQuery();
-	    	
-	    	while(rs.next())
-	    	{
-	    		if(rs.getString("origin_airport_code") == departureAirportCode
-	    				&& rs.getString("destination_airport_code") == departureAirportCode
-	    				&& rs.getString("takeoff_time") == departureDate)
-	    		{
-	    			out.println("<td>" + rs.getString("flight_id") + "</td>");
-	    		}
-	    	}
-	    }
-	    
-	    //Find flight if round trip
-	    //if(roundTrip.isChecked())
-	    
-		
-	}catch (Exception e) {
-		    out.println("Unable to connect to DB. Please try again later.");
-		    e.printStackTrace();
-		}
-	
+    // Get parameters from index.jsp form submission
+    String departureAirportCode = request.getParameter("fromAirport");
+    String arrivalAirportCode = request.getParameter("toAirport");
+    String departureDateStr = request.getParameter("departureDate");
+    String isRoundTrip = request.getParameter("isRoundTrip");
+    String returnDateStr = request.getParameter("returnDate");
+    String flexibleDates = request.getParameter("flexibleDates");
+    
+    // Get filter/sort parameters from potential subsequent requests
+    String sortBy = request.getParameter("sortBy");
+    String maxPrice = request.getParameter("maxPrice");
+    String maxStops = request.getParameter("maxStops");
+    String airlines = request.getParameter("airlines");
+    
+    Connection con = null;
+    try {
+        // Validate required parameters from original search
+        if(departureAirportCode == null || departureAirportCode.isEmpty() || 
+           arrivalAirportCode == null || arrivalAirportCode.isEmpty() ||
+           departureDateStr == null || departureDateStr.isEmpty()) {
+            throw new Exception("Please fill in all required fields");
+        }
+        
+        ApplicationDB db = new ApplicationDB();    
+        con = db.getConnection();
+        
+        // Prepare base query with joins for airport and airline info
+        StringBuilder query = new StringBuilder(
+            "SELECT f.*, a.airline, ap1.city as origin_city, ap2.city as destination_city " +
+            "FROM flights f " +
+            "JOIN airline a ON f.airline_id = a.airline_id " +
+            "JOIN airports ap1 ON f.origin_airport_code = ap1.airport_code " +
+            "JOIN airports ap2 ON f.destination_airport_code = ap2.airport_code " +
+            "WHERE f.origin_airport_code = ? AND f.destination_airport_code = ? ");
+        
+        // Handle date filtering (flexible dates or exact date)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate departureDate = LocalDate.parse(departureDateStr, formatter);
+        
+        if("on".equals(flexibleDates)) {
+            query.append("AND DATE(f.takeoff_time) BETWEEN ? AND ? ");
+        } else {
+            query.append("AND DATE(f.takeoff_time) = ? ");
+        }
+        
+        // Add filters if specified
+        if(maxPrice != null && !maxPrice.isEmpty()) {
+            query.append("AND f.price <= ? ");
+        }
+        if(maxStops != null && !maxStops.isEmpty()) {
+            query.append("AND f.stops <= ? ");
+        }
+        if(airlines != null && !airlines.isEmpty()) {
+            query.append("AND f.airline_id IN (");
+            String[] airlineArray = airlines.split(",");
+            for(int i = 0; i < airlineArray.length; i++) {
+                query.append("?");
+                if(i < airlineArray.length - 1) query.append(",");
+            }
+            query.append(") ");
+        }
+        
+        // Add sorting
+        if(sortBy != null && !sortBy.isEmpty()) {
+            switch(sortBy) {
+                case "price": query.append("ORDER BY f.price "); break;
+                case "takeoff": query.append("ORDER BY f.takeoff_time "); break;
+                case "landing": query.append("ORDER BY f.landing_time "); break;
+                case "duration": query.append("ORDER BY f.duration "); break;
+                default: query.append("ORDER BY f.takeoff_time ");
+            }
+        } else {
+            query.append("ORDER BY f.takeoff_time ");
+        }
+        
+        // Execute query with parameters
+        PreparedStatement pst = con.prepareStatement(query.toString());
+        int paramIndex = 1;
+        pst.setString(paramIndex++, departureAirportCode.toUpperCase());
+        pst.setString(paramIndex++, arrivalAirportCode.toUpperCase());
+        
+        if("on".equals(flexibleDates)) {
+            pst.setString(paramIndex++, departureDate.minusDays(3).toString());
+            pst.setString(paramIndex++, departureDate.plusDays(3).toString());
+        } else {
+            pst.setString(paramIndex++, departureDate.toString());
+        }
+        
+        if(maxPrice != null && !maxPrice.isEmpty()) {
+            pst.setBigDecimal(paramIndex++, new java.math.BigDecimal(maxPrice));
+        }
+        if(maxStops != null && !maxStops.isEmpty()) {
+            pst.setInt(paramIndex++, Integer.parseInt(maxStops));
+        }
+        if(airlines != null && !airlines.isEmpty()) {
+            String[] airlineArray = airlines.split(",");
+            for(String airline : airlineArray) {
+                pst.setString(paramIndex++, airline);
+            }
+        }
+        
+        ResultSet rs = pst.executeQuery();
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Search Results</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; position: sticky; top: 0; }
+        .filter-panel { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .filter-group { margin-bottom: 10px; }
+        label { display: inline-block; width: 120px; }
+        .search-params { margin-bottom: 20px; font-size: 1.1em; }
+   
+    .action-buttons {
+        margin: 20px 0;
+        text-align: center;
+    }
+    .back-button {
+        padding: 10px 20px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    .back-button:hover {
+        background-color: #5a6268;
+    }
+</style>
+</head>
+<body>
+    <h1>Flight Search Results</h1>
+    
+    <div class="search-params">
+        <strong>Search Criteria:</strong><br>
+        <%= departureAirportCode %> to <%= arrivalAirportCode %> | 
+        Departure: <%= departureDateStr %>
+        <% if("on".equals(isRoundTrip)) { %>
+            | Return: <%= returnDateStr %>
+        <% } %>
+        <% if("on".equals(flexibleDates)) { %>
+            (±3 days)
+        <% } %>
+    </div>
+    
+    <div class="filter-panel">
+        <h3>Refine Results</h3>
+        <form method="GET">
+            <!-- Maintain original search parameters -->
+            <input type="hidden" name="fromAirport" value="<%= departureAirportCode %>">
+            <input type="hidden" name="toAirport" value="<%= arrivalAirportCode %>">
+            <input type="hidden" name="departureDate" value="<%= departureDateStr %>">
+            <input type="hidden" name="isRoundTrip" value="<%= isRoundTrip %>">
+            <input type="hidden" name="flexibleDates" value="<%= flexibleDates %>">
+            <% if("on".equals(isRoundTrip)) { %>
+                <input type="hidden" name="returnDate" value="<%= returnDateStr %>">
+            <% } %>
+            
+            <div class="filter-group">
+                <label for="maxPrice">Max Price:</label>
+                <input type="number" id="maxPrice" name="maxPrice" value="<%= maxPrice != null ? maxPrice : "" %>" placeholder="Any">
+            </div>
+            
+            <div class="filter-group">
+                <label for="maxStops">Max Stops:</label>
+                <select id="maxStops" name="maxStops">
+                    <option value="">Any</option>
+                    <option value="0" <%= "0".equals(maxStops) ? "selected" : "" %>>Non-stop only</option>
+                    <option value="1" <%= "1".equals(maxStops) ? "selected" : "" %>>1 stop max</option>
+                    <option value="2" <%= "2".equals(maxStops) ? "selected" : "" %>>2 stops max</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="airlines">Airlines:</label>
+                <select id="airlines" name="airlines" multiple>
+                    <option value="AA" <%= airlines != null && airlines.contains("AA") ? "selected" : "" %>>American Airlines</option>
+                    <option value="DL" <%= airlines != null && airlines.contains("DL") ? "selected" : "" %>>Delta</option>
+                    <option value="UA" <%= airlines != null && airlines.contains("UA") ? "selected" : "" %>>United</option>
+                    <option value="WN" <%= airlines != null && airlines.contains("WN") ? "selected" : "" %>>Southwest</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="sortBy">Sort By:</label>
+                <select id="sortBy" name="sortBy">
+                    <option value="takeoff" <%= "takeoff".equals(sortBy) ? "selected" : "" %>>Takeoff Time</option>
+                    <option value="landing" <%= "landing".equals(sortBy) ? "selected" : "" %>>Landing Time</option>
+                    <option value="duration" <%= "duration".equals(sortBy) ? "selected" : "" %>>Duration</option>
+                    <option value="price" <%= "price".equals(sortBy) ? "selected" : "" %>>Price (Low to High)</option>
+                </select>
+            </div>
+            
+            <button type="submit">Apply Filters</button>
+        </form>
+    </div>
+    
+    <% if(!rs.isBeforeFirst()) { %>
+        <div class="no-results">No flights found matching your criteria.</div>
+    <% } else { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Flight #</th>
+                    <th>Airline</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Duration</th>
+                    <th>Stops</th>
+                    <th>Price</th>
+                    <th>Seats</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% while(rs.next()) { %>
+                    <tr>
+                        <td><%= rs.getString("flight_id") %></td>
+                        <td><%= rs.getString("airline") %></td>
+                        <td>
+                            <%= rs.getString("origin_city") %> (<%= rs.getString("origin_airport_code") %>)<br>
+                            <%= rs.getTimestamp("takeoff_time").toLocalDateTime().format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")) %>
+                        </td>
+                        <td>
+                            <%= rs.getString("destination_city") %> (<%= rs.getString("destination_airport_code") %>)<br>
+                            <%= rs.getTimestamp("landing_time").toLocalDateTime().format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")) %>
+                        </td>
+                        <td><%= rs.getInt("duration")/60 %>h <%= rs.getInt("duration")%60 %>m</td>
+                        <td><%= rs.getInt("stops") %></td>
+                        <td>$<%= String.format("%.2f", rs.getBigDecimal("price")) %></td>
+                        <td><%= rs.getInt("available_seats") %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } %>
+    
+    <% if("on".equals(isRoundTrip)) { %>
+        <h2>Return Flights</h2>
+        <!-- Similar implementation for return flights would go here -->
+    <% } %>
+    
+    <div class="action-buttons">
+        <a href="index.jsp" class="back-button">Back to Search</a>
+    </div>
+    
+</body>
+</html>
+
+<%
+    } catch (Exception e) {
+        out.println("<div class='error'>Error: " + e.getMessage() + "</div>");
+    } finally {
+        if(con != null) con.close();
+    }
+%>
 	
 	
 %>

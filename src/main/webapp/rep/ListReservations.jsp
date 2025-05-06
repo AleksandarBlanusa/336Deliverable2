@@ -56,7 +56,7 @@
         <% } %>
     </table>
 
-    <form action="index.jsp">
+    <form action="CustomerRep.jsp">
         <button type="submit">Back to Home</button>
     </form>
 </body>

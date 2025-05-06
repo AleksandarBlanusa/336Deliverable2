@@ -1,12 +1,14 @@
-<%@ page import="java.sql.*, java.math.BigDecimal, cs336.pkg.AircraftOps, cs336.pkg.Aircraft, cs336.pkg.Airport, cs336.pkg.Flight" %>
+<%@ page import="java.sql.*, java.math.BigDecimal, cs336.pkg.*" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <%
     String action = request.getParameter("action");
     AircraftOps ops = new AircraftOps();
+    ApplicationDB db = new ApplicationDB();
     Connection conn = null;
 
     try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/336project", "root", "M0stW4nted03");
+        conn = db.getConnection();
 
         if ("addAircraft".equals(action)) {
             String model = request.getParameter("model");
@@ -78,15 +80,13 @@
             ops.addFlight(conn, f);
             response.sendRedirect("ListFlights.jsp");
             return;
-        
+
         } else if ("deleteFlight".equals(action)) {
-        	int id = Integer.parseInt(request.getParameter("flightId"));
-        	ops.deleteFlight(conn, id);
-        	response.sendRedirect("ListFlights.jsp");
-        	return;
-    }
-        
-        
+            int id = Integer.parseInt(request.getParameter("flightId"));
+            ops.deleteFlight(conn, id);
+            response.sendRedirect("ListFlights.jsp");
+            return;
+        }
 
     } catch (Exception e) {
         request.setAttribute("message", "Error: " + e.getMessage());
@@ -96,7 +96,6 @@
     }
 %>
 
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,23 +117,22 @@
     <div style="color: red;"><%= request.getAttribute("message") %></div>
 <% } %>
 
-<!-- Forms are only shown if no action is taken -->
 <% if (action == null) { %>
 
-	<!-- View Lists -->
-	<div style="margin-bottom: 20px;">
-    	<form action="ListAircrafts.jsp" method="get" style="display:inline;">
-        	<button type="submit">View All Aircrafts</button>
-    	</form>
+    <!-- View Lists -->
+    <div style="margin-bottom: 20px;">
+        <form action="ListAircrafts.jsp" method="get" style="display:inline;">
+            <button type="submit">View All Aircrafts</button>
+        </form>
 
-    	<form action="ListAirports.jsp" method="get" style="display:inline; margin-left:10px;">
-        	<button type="submit">View All Airports</button>
-    	</form>
+        <form action="ListAirports.jsp" method="get" style="display:inline; margin-left:10px;">
+            <button type="submit">View All Airports</button>
+        </form>
 
-    	<form action="ListFlights.jsp" method="get" style="display:inline; margin-left:10px;">
-        	<button type="submit">View All Flights</button>
-    	</form>
-	</div>
+        <form action="ListFlights.jsp" method="get" style="display:inline; margin-left:10px;">
+            <button type="submit">View All Flights</button>
+        </form>
+    </div>
 
     <!-- Add Aircraft -->
     <h2>Add Aircraft</h2>
@@ -257,8 +255,6 @@
 
         <button type="submit">Add Flight</button>
     </form>
-    
-    
 
 <% } %>
 

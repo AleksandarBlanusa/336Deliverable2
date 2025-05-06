@@ -42,15 +42,15 @@ public class WaitingList {
     public Flight getFlight() { return flight; }
     public void setFlight(Flight flight) { this.flight = flight; }
     
-    public User getCustomer() { return user; }
-    public void setCustomer(User user) { this.user = user; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     
     @Override
     public String toString() {
         return "WaitingList{" +
                 "waitlistId=" + waitlistId +
                 ", flight=" + (flight != null ? flight.getFlightNumber() : "N/A") +
-                ", customer=" + (user != null ? user.getFullName() : "N/A") +
+                ", user=" + (user != null ? user.getFullName() : "N/A") +
                 ", requestDate=" + requestDate +
                 ", status='" + status + '\'' +
                 '}';

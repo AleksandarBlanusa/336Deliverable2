@@ -53,7 +53,7 @@
         <% } %>
     </table>
 
-    <form action="index.jsp" method="get">
+    <form action="CustomerRep.jsp" method="get">
         <button type="submit">Back to Home</button>
     </form>
 </body>

@@ -143,24 +143,6 @@
         <button type="submit" name="action" value="replyToUser">Submit Answer</button>
     </form>
 
-    <h2>View Waiting List</h2>
-    <table border="1">
-        <tr><th>User ID</th><th>Name</th></tr>
-        <% 
-            List<User> waitingList = (List<User>) request.getAttribute("waitingList");
-            if (waitingList != null) {
-                for (User user : waitingList) {
-        %>
-                    <tr>
-                        <td><%= user.getUserId() %></td>
-                        <td><%= user.getFullName() %></td>
-                    </tr>
-        <%  
-                }
-            } 
-        %>
-    </table>
-
     <form action="index.jsp" method="get">
         <button type="submit">Go Back to Home</button>
     </form>

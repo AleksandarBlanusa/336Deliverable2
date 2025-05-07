@@ -58,7 +58,7 @@
 
 
 	<h2>Navigation</h2>
-	<form action="ListReservations.jsp" method="get" style="display:inline;">
+	<form action="./ListReservations.jsp" method="get" style="display:inline;">
     	<button type="submit">View All Reservations</button>
 	</form>
 

@@ -105,10 +105,10 @@
         // Set default departure date to today
         document.getElementById('departureDate').valueAsDate = new Date();
         
-        // Set minimum date to today for both date fields
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('departureDate').min = today;
-        document.getElementById('returnDate').min = today;
+        // Set minimum date to today for both date fields CHANGE THIS TO TEST OUT STUFF
+  //    const today = new Date().toISOString().split('T')[0];
+   //   document.getElementById('departureDate').min = today;
+   //   document.getElementById('returnDate').min = today;
         
         // Auto-set return date to 7 days after departure
         document.getElementById('departureDate').addEventListener('change', function() {
@@ -118,5 +118,21 @@
             document.getElementById('returnDate').valueAsDate = returnDate;
         });
     </script>
+    <%
+    String role = (String) session.getAttribute("role");
+%>
+
+<% if ("customer".equals(role)) { %>
+    <div style="text-align: center; margin-top: 40px;">
+        <form action="askQuestion.jsp" method="get" style="display: inline;">
+            <button type="submit">Ask a Question</button>
+        </form>
+
+        <form action="myQuestions.jsp" method="get" style="display: inline;">
+            <button type="submit">View My Questions & Answers</button>
+        </form>
+    </div>
+<% } %>
+    
 </body>
 </html>

@@ -222,6 +222,7 @@
                     <th>Stops</th>
                     <th>Price</th>
                     <th>Seats</th>
+                    <th>Reserve</th>
                 </tr>
             </thead>
             <tbody>
@@ -241,6 +242,18 @@
                         <td><%= rs.getInt("stops") %></td>
                         <td>$<%= String.format("%.2f", rs.getBigDecimal("price")) %></td>
                         <td><%= rs.getInt("available_seats") %></td>
+                        <td>
+    <form method="post" action="makeReservation.jsp">
+        <input type="hidden" name="flight_id" value="<%= rs.getInt("flight_id") %>">
+        <select name="seat_class">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+            <option value="first">First</option>
+        </select>
+        <button type="submit">Reserve</button>
+    </form>
+</td>
+                        
                     </tr>
                 <% } %>
             </tbody>

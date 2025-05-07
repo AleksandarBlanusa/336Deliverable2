@@ -5,13 +5,14 @@ public class Aircraft {
     private String model;
     private int capacity;
 
-    public Aircraft(int aircraftId, String model, int capacity) {
-        this.aircraftId = aircraftId;
+	public Aircraft(int aircraftId, String model, int capacity) {
+		this.aircraftId = aircraftId;
         this.model = model;
         this.capacity = capacity;
-    }
+	}
 
-    public int getAircraftId() {
+
+	public int getAircraftId() {
         return aircraftId;
     }
 

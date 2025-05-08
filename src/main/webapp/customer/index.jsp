@@ -131,6 +131,15 @@
         <form action="myQuestions.jsp" method="get" style="display: inline;">
             <button type="submit">View My Questions & Answers</button>
         </form>
+        
+        <form action="MyPastReservations.jsp" method="get" style="display: inline;">
+            <button type="submit">View Past Reservations</button>
+        </form>
+        <form action="UpcomingFlights.jsp" method="get" style="display: inline;">
+   			<button type="submit">View Upcoming Flights</button>
+		</form>
+		
+        
     </div>
 <% } %>
     

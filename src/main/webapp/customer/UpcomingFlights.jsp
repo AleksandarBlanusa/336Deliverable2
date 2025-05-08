@@ -57,7 +57,7 @@
                 while (rs.next()) {
             %>
                 <tr>
-                    <td><%= rs.getString("flight_number") %></td>
+                    <td><%= rs.getString("flight_id") %></td>
                     <td><%= rs.getString("airline") %></td>
                     <td><%= rs.getTimestamp("takeoff_time").toLocalDateTime().format(dtf) %></td>
                     <td><%= rs.getTimestamp("landing_time").toLocalDateTime().format(dtf) %></td>

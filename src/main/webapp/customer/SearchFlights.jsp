@@ -149,7 +149,7 @@
         <strong>Search Criteria:</strong><br>
         <%= departureAirportCode %> to <%= arrivalAirportCode %> | 
         Departure: <%= departureDateStr %>
-        <% if("on".equals(isRoundTrip)) { %>
+        <% if("roundTrip".equals(isRoundTrip)) { %>
             | Return: <%= returnDateStr %>
         <% } %>
         <% if("on".equals(flexibleDates)) { %>
@@ -166,9 +166,9 @@
             <input type="hidden" name="departureDate" value="<%= departureDateStr %>">
             <input type="hidden" name="isRoundTrip" value="<%= isRoundTrip %>">
             <input type="hidden" name="flexibleDates" value="<%= flexibleDates %>">
-            <% if("roundTrip".equals(isRoundTrip)) { %>
-                <input type="hidden" name="returnDate" value="<%= returnDateStr %>">
-                <input type="hidden" name="tripType" value="<%= isRoundTrip %>">          
+            <input type="hidden" name="tripType" value="<%= isRoundTrip %>">  
+            <% if("roundtrip".equals(isRoundTrip)) { %>
+                <input type="hidden" name="returnDate" value="<%= returnDateStr %>">        
            <% } %>
             
             <div class="filter-group">
@@ -189,8 +189,7 @@
             <div class="filter-group">
                 <label for="airlines">Airlines:</label>
                 <select id="airlines" name="airlines" multiple>
-                	<option value="all" <%= (airlines == null || airlines.isEmpty()) ? "selected" : "" %>>All Airlines</option>
-                    <option value="AA" <%= airlines != null && airlines.contains("AA") ? "selected" : "" %>>American Airlines</option>
+                	<option value="AA" <%= airlines != null && airlines.contains("AA") ? "selected" : "" %>>American Airlines</option>
                     <option value="DL" <%= airlines != null && airlines.contains("DL") ? "selected" : "" %>>Delta</option>
                     <option value="UA" <%= airlines != null && airlines.contains("UA") ? "selected" : "" %>>United</option>
                     <option value="WN" <%= airlines != null && airlines.contains("WN") ? "selected" : "" %>>Southwest</option>
@@ -271,8 +270,7 @@
                         "JOIN airline a ON f.airline_id = a.airline_id " +
                         "JOIN airports ap1 ON f.origin_airport_code = ap1.airport_code " +
                         "JOIN airports ap2 ON f.destination_airport_code = ap2.airport_code " +
-                        "WHERE f.origin_airport_code = ? AND f.destination_airport_code = ? " +
-                        "AND DATE(f.takeoff_time) >= ? ";
+                        "WHERE f.origin_airport_code = ? AND f.destination_airport_code = ? ";
     
     if("on".equals(flexibleDates)) {
         returnQuery += "AND DATE(f.takeoff_time) BETWEEN ? AND ? ";
@@ -287,8 +285,14 @@
     if(maxStops != null && !maxStops.isEmpty()) {
         returnQuery += ("AND f.stops <= ? ");
     }
-    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
-        returnQuery += ("AND f.airline_id = ? ");
+    if(airlines != null && !airlines.isEmpty()) {
+    	returnQuery += ("AND f.airline_id IN (");
+        String[] airlineArray = airlines.split(",");
+        for(int i = 0; i < airlineArray.length; i++) {
+            returnQuery += ("?");
+            if(i < airlineArray.length - 1) returnQuery += (",");
+        }
+        returnQuery += (") ");
     }
     
  	// Add sorting
@@ -327,8 +331,11 @@
     if(maxStops != null && !maxStops.isEmpty()) {
         returnPst.setInt(returnParamIndex++, Integer.parseInt(maxStops));
     }
-    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
-        returnPst.setString(returnParamIndex++, airlines);
+    if(airlines != null && !airlines.isEmpty()) {
+    	String[] airlineArray = airlines.split(",");
+        for(String airline : airlineArray) {
+            returnPst.setString(returnParamIndex++, airline);
+        }
     }
     
     ResultSet returnRs = returnPst.executeQuery();
@@ -346,11 +353,12 @@
                 <th>Stops</th>
                 <th>Price</th>
                 <th>Seats</th>
+                <th>Reserve</th>
             </tr>
         </thead>
         <tbody>
         <% if(!returnRs.isBeforeFirst()) { %>
-                <tr><td colspan="8">No return flights found</td></tr>
+                <tr><td colspan="9">No return flights found</td></tr>
             <% } else { %>
             <% while(returnRs.next()) { %>
                 <tr>
@@ -368,6 +376,18 @@
                     <td><%= returnRs.getInt("stops") %></td>
                     <td>$<%= String.format("%.2f", returnRs.getBigDecimal("price")) %></td>
                     <td><%= returnRs.getInt("available_seats") %></td>
+                    <td>
+    <form method="post" action="makeReservation.jsp">
+        <input type="hidden" name="flight_id" value="<%= returnRs.getInt("flight_id") %>">
+        <select name="seat_class">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+            <option value="first">First</option>
+        </select>
+        <button type="submit">Reserve</button>
+    </form>
+</td>
+
                 </tr>
             <% } %>
           <% } %>

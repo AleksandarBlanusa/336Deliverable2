@@ -5,6 +5,8 @@
 <%@ page import="java.time.LocalDate,java.time.format.DateTimeFormatter" %>
 
 <%
+	//Test Comment
+	
     // Get parameters from index.jsp form submission
     String departureAirportCode = request.getParameter("fromAirport");
     String arrivalAirportCode = request.getParameter("toAirport");

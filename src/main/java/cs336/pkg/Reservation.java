@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Reservation {
     private int reservationId;
-    private int customerId;
+    private int userID;
     private int flightId;
     private LocalDateTime bookingDate;
     private String seatNumber;
@@ -13,17 +13,18 @@ public class Reservation {
     private int createdBy;
     
     // References
-    private Customer customer;
+    private User user;
     private Flight flight;
     private User createdByUser;
     
+   
     // Constructors
     public Reservation() {}
     
-    public Reservation(int reservationId, int customerId, int flightId, LocalDateTime bookingDate, 
+    public Reservation(int reservationId, int userID, int flightId, LocalDateTime bookingDate, 
                      String seatNumber, BigDecimal ticketPrice, String status, int createdBy) {
         this.reservationId = reservationId;
-        this.customerId = customerId;
+        this.userID = userID;
         this.flightId = flightId;
         this.bookingDate = bookingDate;
         this.seatNumber = seatNumber;
@@ -36,8 +37,8 @@ public class Reservation {
     public int getReservationId() { return reservationId; }
     public void setReservationId(int reservationId) { this.reservationId = reservationId; }
     
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
+    public int getUserId() { return userID; }
+    public void setUserId(int userID) { this.userID = userID; }
     
     public int getFlightId() { return flightId; }
     public void setFlightId(int flightId) { this.flightId = flightId; }
@@ -57,8 +58,8 @@ public class Reservation {
     public int getCreatedBy() { return createdBy; }
     public void setCreatedBy(int createdBy) { this.createdBy = createdBy; }
     
-    public Customer getCustomer() { return customer; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     
     public Flight getFlight() { return flight; }
     public void setFlight(Flight flight) { this.flight = flight; }
@@ -70,7 +71,7 @@ public class Reservation {
     public String toString() {
         return "Reservation{" +
                 "reservationId=" + reservationId +
-                ", customer=" + (customer != null ? customer.getFullName() : "N/A") +
+                ", user=" + (user != null ? user.getFullName() : "N/A") +
                 ", flight=" + (flight != null ? flight.getFlightNumber() : "N/A") +
                 ", bookingDate=" + bookingDate +
                 ", seatNumber='" + seatNumber + '\'' +

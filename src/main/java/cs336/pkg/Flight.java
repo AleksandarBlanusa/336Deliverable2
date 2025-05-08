@@ -1,3 +1,4 @@
+// Updated Flight.java to embed full Airline object in addition to airlineCode
 package cs336.pkg;
 
 import java.math.BigDecimal;
@@ -8,9 +9,9 @@ import java.util.List;
 public class Flight {
     private int flightId;
     private String flightNumber;
-    private String airlineCode;           // fixed
-    private String departureAirportCode;  // fixed
-    private String arrivalAirportCode;    // fixed
+    private String airlineCode;           // retained for direct use
+    private String departureAirportCode;
+    private String arrivalAirportCode;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
     private BigDecimal basePrice;
@@ -19,12 +20,12 @@ public class Flight {
     private int stops;
     private int duration;
     private String status;
-    
-    private Airline airline;
+
+    private Airline airline; // new embedded object
     private Airport departureAirport;
     private Airport arrivalAirport;
     private Aircraft aircraft;
-    private List<User> users;  // Passengers on the flight
+    private List<User> users;
 
     public Flight() {
         this.users = new ArrayList<>();
@@ -85,7 +86,6 @@ public class Flight {
     public List<User> getUsers() { return users; }
     public void setUsers(List<User> users) { this.users = users; }
 
-    // Helper method
     public boolean addUser(User user) {
         if (users.size() < availableSeats) {
             users.add(user);

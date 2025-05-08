@@ -5,27 +5,34 @@
     CustomerRep rep = new CustomerRep();  // Use your CustomerRep class
 
     if (action != null) {
-        if ("makeReservation".equals(action)) {
-            int flightId = Integer.parseInt(request.getParameter("flightId"));
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            boolean success = rep.makeReservation(flightId, userId, "economy");
-            request.setAttribute("message", success ? "Reservation made successfully!" : "Flight full. Added to waiting list.");
-
-        } else if ("editReservation".equals(action)) {
-            int flightId = Integer.parseInt(request.getParameter("flightId"));
-            int oldUserId = Integer.parseInt(request.getParameter("oldUserId"));
-            int newUserId = Integer.parseInt(request.getParameter("newUserId"));
-            rep.editReservation(flightId, oldUserId, newUserId);
-            request.setAttribute("message", "Reservation updated successfully.");
-
-        } else if ("cancelReservation".equals(action)) {
-            int flightId = Integer.parseInt(request.getParameter("flightId"));
-            int userId = Integer.parseInt(request.getParameter("cancelUserId"));
-            rep.cancelReservation(flightId, userId);
-            request.setAttribute("message", "Reservation canceled and seat released.");
-
-
-        } else if ("replyToUser".equals(action)) {
+    	if ("makeReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int userId = Integer.parseInt(request.getParameter("userId"));
+    	    boolean success = rep.makeReservation(flightId, userId, "economy");
+    	    request.setAttribute("message", success ? "Reservation made successfully!" : "Flight full. Added to waiting list.");
+    	    if (success) {
+    	        response.sendRedirect("ListReservations.jsp");
+    	        return;
+    	    }
+    	    
+    	} else if ("editReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int oldUserId = Integer.parseInt(request.getParameter("oldUserId"));
+    	    int newUserId = Integer.parseInt(request.getParameter("newUserId"));
+    	    rep.editReservation(flightId, oldUserId, newUserId);
+    	    request.setAttribute("message", "Reservation updated successfully.");
+    	    response.sendRedirect("ListReservations.jsp");
+    	    return;
+    	    
+    	} else if ("cancelReservation".equals(action)) {
+    	    int flightId = Integer.parseInt(request.getParameter("flightId"));
+    	    int userId = Integer.parseInt(request.getParameter("cancelUserId"));
+    	    rep.cancelReservation(flightId, userId);
+    	    request.setAttribute("message", "Reservation canceled and seat released.");
+    	    response.sendRedirect("ListReservations.jsp");
+    	    return;
+    	    
+    	} else if ("replyToUser".equals(action)) {
             int questionId = Integer.parseInt(request.getParameter("questionId"));
             String answerText = request.getParameter("answerText");
             rep.replyToUser(questionId, answerText);
@@ -48,6 +55,17 @@
     </style>
 </head>
 <body>
+
+
+	<h2>Navigation</h2>
+	<form action="./ListReservations.jsp" method="get" style="display:inline;">
+    	<button type="submit">View All Reservations</button>
+	</form>
+
+	<form action="ListWaitinglist.jsp" method="get" style="display:inline;">
+    	<button type="submit">View Waiting List</button>
+	</form>
+
 
     <h1>User Reservations</h1>
 
@@ -124,24 +142,6 @@
 
         <button type="submit" name="action" value="replyToUser">Submit Answer</button>
     </form>
-
-    <h2>View Waiting List</h2>
-    <table border="1">
-        <tr><th>User ID</th><th>Name</th></tr>
-        <% 
-            List<User> waitingList = (List<User>) request.getAttribute("waitingList");
-            if (waitingList != null) {
-                for (User user : waitingList) {
-        %>
-                    <tr>
-                        <td><%= user.getUserId() %></td>
-                        <td><%= user.getFullName() %></td>
-                    </tr>
-        <%  
-                }
-            } 
-        %>
-    </table>
 
     <form action="index.jsp" method="get">
         <button type="submit">Go Back to Home</button>

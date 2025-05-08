@@ -4,21 +4,21 @@ import java.time.LocalDateTime;
 public class WaitingList {
     private int waitlistId;
     private int flightId;
-    private int customerId;
+    private int userId;
     private LocalDateTime requestDate;
     private String status;
     
     // References
     private Flight flight;
-    private Customer customer;
+    private User user;
     
     // Constructors
     public WaitingList() {}
     
-    public WaitingList(int waitlistId, int flightId, int customerId, LocalDateTime requestDate, String status) {
+    public WaitingList(int waitlistId, int flightId, int userId, LocalDateTime requestDate, String status) {
         this.waitlistId = waitlistId;
         this.flightId = flightId;
-        this.customerId = customerId;
+        this.userId = userId;
         this.requestDate = requestDate;
         this.status = status;
     }
@@ -30,8 +30,8 @@ public class WaitingList {
     public int getFlightId() { return flightId; }
     public void setFlightId(int flightId) { this.flightId = flightId; }
     
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
     
     public LocalDateTime getRequestDate() { return requestDate; }
     public void setRequestDate(LocalDateTime requestDate) { this.requestDate = requestDate; }
@@ -42,15 +42,15 @@ public class WaitingList {
     public Flight getFlight() { return flight; }
     public void setFlight(Flight flight) { this.flight = flight; }
     
-    public Customer getCustomer() { return customer; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     
     @Override
     public String toString() {
         return "WaitingList{" +
                 "waitlistId=" + waitlistId +
                 ", flight=" + (flight != null ? flight.getFlightNumber() : "N/A") +
-                ", customer=" + (customer != null ? customer.getFullName() : "N/A") +
+                ", user=" + (user != null ? user.getFullName() : "N/A") +
                 ", requestDate=" + requestDate +
                 ", status='" + status + '\'' +
                 '}';

@@ -4,9 +4,7 @@
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 <%@ page import="java.time.LocalDate,java.time.format.DateTimeFormatter" %>
 
-<%
-	//Test Comment
-	
+<%	
     // Get parameters from index.jsp form submission
     String departureAirportCode = request.getParameter("fromAirport");
     String arrivalAirportCode = request.getParameter("toAirport");
@@ -59,7 +57,7 @@
         if(maxStops != null && !maxStops.isEmpty()) {
             query.append("AND f.stops <= ? ");
         }
-        if(airlines != null && !airlines.isEmpty()) {
+        if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
             query.append("AND f.airline_id IN (");
             String[] airlineArray = airlines.split(",");
             for(int i = 0; i < airlineArray.length; i++) {
@@ -101,7 +99,7 @@
         if(maxStops != null && !maxStops.isEmpty()) {
             pst.setInt(paramIndex++, Integer.parseInt(maxStops));
         }
-        if(airlines != null && !airlines.isEmpty()) {
+        if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
             String[] airlineArray = airlines.split(",");
             for(String airline : airlineArray) {
                 pst.setString(paramIndex++, airline);
@@ -189,6 +187,7 @@
             <div class="filter-group">
                 <label for="airlines">Airlines:</label>
                 <select id="airlines" name="airlines" multiple>
+                	<option value="all" <%= (airlines == null || airlines.isEmpty()) ? "selected" : "" %>>All Airlines</option>
                 	<option value="AA" <%= airlines != null && airlines.contains("AA") ? "selected" : "" %>>American Airlines</option>
                     <option value="DL" <%= airlines != null && airlines.contains("DL") ? "selected" : "" %>>Delta</option>
                     <option value="UA" <%= airlines != null && airlines.contains("UA") ? "selected" : "" %>>United</option>
@@ -285,7 +284,7 @@
     if(maxStops != null && !maxStops.isEmpty()) {
         returnQuery += ("AND f.stops <= ? ");
     }
-    if(airlines != null && !airlines.isEmpty()) {
+    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
     	returnQuery += ("AND f.airline_id IN (");
         String[] airlineArray = airlines.split(",");
         for(int i = 0; i < airlineArray.length; i++) {
@@ -331,7 +330,7 @@
     if(maxStops != null && !maxStops.isEmpty()) {
         returnPst.setInt(returnParamIndex++, Integer.parseInt(maxStops));
     }
-    if(airlines != null && !airlines.isEmpty()) {
+    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
     	String[] airlineArray = airlines.split(",");
         for(String airline : airlineArray) {
             returnPst.setString(returnParamIndex++, airline);

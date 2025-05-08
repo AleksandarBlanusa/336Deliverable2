@@ -9,7 +9,7 @@
     String departureAirportCode = request.getParameter("fromAirport");
     String arrivalAirportCode = request.getParameter("toAirport");
     String departureDateStr = request.getParameter("departureDate");
-    String isRoundTrip = request.getParameter("isRoundTrip");
+    String isRoundTrip = request.getParameter("tripType");
     String returnDateStr = request.getParameter("returnDate");
     String flexibleDates = request.getParameter("flexibleDates");
     
@@ -164,9 +164,10 @@
             <input type="hidden" name="departureDate" value="<%= departureDateStr %>">
             <input type="hidden" name="isRoundTrip" value="<%= isRoundTrip %>">
             <input type="hidden" name="flexibleDates" value="<%= flexibleDates %>">
-            <% if("on".equals(isRoundTrip)) { %>
+            <% if("roundTrip".equals(isRoundTrip)) { %>
                 <input type="hidden" name="returnDate" value="<%= returnDateStr %>">
-            <% } %>
+                <input type="hidden" name="tripType" value="<%= isRoundTrip %>">          
+           <% } %>
             
             <div class="filter-group">
                 <label for="maxPrice">Max Price:</label>
@@ -186,6 +187,7 @@
             <div class="filter-group">
                 <label for="airlines">Airlines:</label>
                 <select id="airlines" name="airlines" multiple>
+                	<option value="all" <%= (airlines == null || airlines.isEmpty()) ? "selected" : "" %>>All Airlines</option>
                     <option value="AA" <%= airlines != null && airlines.contains("AA") ? "selected" : "" %>>American Airlines</option>
                     <option value="DL" <%= airlines != null && airlines.contains("DL") ? "selected" : "" %>>Delta</option>
                     <option value="UA" <%= airlines != null && airlines.contains("UA") ? "selected" : "" %>>United</option>
@@ -222,6 +224,7 @@
                     <th>Stops</th>
                     <th>Price</th>
                     <th>Seats</th>
+                    <th>Reserve</th>
                 </tr>
             </thead>
             <tbody>
@@ -241,16 +244,134 @@
                         <td><%= rs.getInt("stops") %></td>
                         <td>$<%= String.format("%.2f", rs.getBigDecimal("price")) %></td>
                         <td><%= rs.getInt("available_seats") %></td>
+                        <td>
+    <form method="post" action="makeReservation.jsp">
+        <input type="hidden" name="flight_id" value="<%= rs.getInt("flight_id") %>">
+        <select name="seat_class">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+            <option value="first">First</option>
+        </select>
+        <button type="submit">Reserve</button>
+    </form>
+</td>
+                    
                     </tr>
                 <% } %>
             </tbody>
         </table>
     <% } %>
     
-    <% if("on".equals(isRoundTrip)) { %>
-        <h2>Return Flights</h2>
-        <!-- Similar implementation for return flights would go here -->
-    <% } %>
+    <% if("roundtrip".equals(isRoundTrip)) { 
+    // Query for return flights (reverse the airports)
+    String returnQuery = "SELECT f.*, a.airline, ap1.city as origin_city, ap2.city as destination_city " +
+                        "FROM flights f " +
+                        "JOIN airline a ON f.airline_id = a.airline_id " +
+                        "JOIN airports ap1 ON f.origin_airport_code = ap1.airport_code " +
+                        "JOIN airports ap2 ON f.destination_airport_code = ap2.airport_code " +
+                        "WHERE f.origin_airport_code = ? AND f.destination_airport_code = ? " +
+                        "AND DATE(f.takeoff_time) >= ? ";
+    
+    if("on".equals(flexibleDates)) {
+        returnQuery += "AND DATE(f.takeoff_time) BETWEEN ? AND ? ";
+    } else {
+        returnQuery += "AND DATE(f.takeoff_time) = ? ";
+    }
+    
+ 	// Add filters if specified
+    if(maxPrice != null && !maxPrice.isEmpty()) {
+        returnQuery += ("AND f.price <= ? ");
+    }
+    if(maxStops != null && !maxStops.isEmpty()) {
+        returnQuery += ("AND f.stops <= ? ");
+    }
+    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
+        returnQuery += ("AND f.airline_id = ? ");
+    }
+    
+ 	// Add sorting
+    if(sortBy != null && !sortBy.isEmpty()) {
+        switch(sortBy) {
+            case "price": returnQuery += ("ORDER BY f.price "); break;
+            case "takeoff": returnQuery += ("ORDER BY f.takeoff_time "); break;
+            case "landing": returnQuery += ("ORDER BY f.landing_time "); break;
+            case "duration": returnQuery += ("ORDER BY f.duration "); break;
+            default: returnQuery += ("ORDER BY f.takeoff_time ");
+        }
+    } else {
+        returnQuery += ("ORDER BY f.takeoff_time ");
+    }
+    
+    PreparedStatement returnPst = con.prepareStatement(returnQuery.toString());
+    int returnParamIndex = 1;
+    
+ // Reverse the airport codes for return flight
+    returnPst.setString(returnParamIndex++, arrivalAirportCode.toUpperCase());
+    returnPst.setString(returnParamIndex++, departureAirportCode.toUpperCase());
+    
+    // Parse return date
+    LocalDate returnDate = LocalDate.parse(returnDateStr, formatter);
+    
+    if("on".equals(flexibleDates)) {
+        returnPst.setString(returnParamIndex++, returnDate.minusDays(3).toString());
+        returnPst.setString(returnParamIndex++, returnDate.plusDays(3).toString());
+    } else {
+        returnPst.setString(returnParamIndex++, returnDate.toString());
+    }
+    
+    if(maxPrice != null && !maxPrice.isEmpty()) {
+        returnPst.setBigDecimal(returnParamIndex++, new java.math.BigDecimal(maxPrice));
+    }
+    if(maxStops != null && !maxStops.isEmpty()) {
+        returnPst.setInt(returnParamIndex++, Integer.parseInt(maxStops));
+    }
+    if(airlines != null && !airlines.isEmpty() && !"all".equals(airlines)) {
+        returnPst.setString(returnParamIndex++, airlines);
+    }
+    
+    ResultSet returnRs = returnPst.executeQuery();
+%>
+
+    <h2>Return Flights</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Flight #</th>
+                <th>Airline</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Duration</th>
+                <th>Stops</th>
+                <th>Price</th>
+                <th>Seats</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% if(!returnRs.isBeforeFirst()) { %>
+                <tr><td colspan="8">No return flights found</td></tr>
+            <% } else { %>
+            <% while(returnRs.next()) { %>
+                <tr>
+                    <td><%= returnRs.getString("flight_id") %></td>
+                    <td><%= returnRs.getString("airline") %></td>
+                    <td>
+                        <%= returnRs.getString("origin_city") %> (<%= returnRs.getString("origin_airport_code") %>)<br>
+                        <%= returnRs.getTimestamp("takeoff_time").toLocalDateTime().format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")) %>
+                    </td>
+                    <td>
+                        <%= returnRs.getString("destination_city") %> (<%= returnRs.getString("destination_airport_code") %>)<br>
+                        <%= returnRs.getTimestamp("landing_time").toLocalDateTime().format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")) %>
+                    </td>
+                    <td><%= returnRs.getInt("duration")/60 %>h <%= returnRs.getInt("duration")%60 %>m</td>
+                    <td><%= returnRs.getInt("stops") %></td>
+                    <td>$<%= String.format("%.2f", returnRs.getBigDecimal("price")) %></td>
+                    <td><%= returnRs.getInt("available_seats") %></td>
+                </tr>
+            <% } %>
+          <% } %>
+        </tbody>
+    </table>
+<% } %>
     
     <div class="action-buttons">
         <a href="index.jsp" class="back-button">Back to Search</a>
@@ -265,7 +386,4 @@
     } finally {
         if(con != null) con.close();
     }
-%>
-	
-	
 %>

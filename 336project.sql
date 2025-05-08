@@ -127,7 +127,14 @@ CREATE TABLE `flights` (
 
 LOCK TABLES `flights` WRITE;
 /*!40000 ALTER TABLE `flights` DISABLE KEYS */;
-INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',30,50,10.00,2),(2,'UA',0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',20,30,7.00,3),(3,'EK',0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',10,70,15.00,1);
+INSERT INTO `flights` VALUES (1,'AA',0,'2025-05-01 14:00:00','2025-05-01 18:30:00',270,'ORD','EWR',30,50,10.00,2),
+(2,'UA',0,'2025-04-21 12:00:00','2025-04-21 16:00:00',240,'EWR','RDU',20,30,7.00,3),
+(3,'EK',0,'2025-03-01 08:00:00','2025-03-01 12:00:00',240,'BOS','RDU',10,70,15.00,1),
+(4,'EK',0,'2025-09-04 14:00:00','2025-09-04 16:00:00',120,'ORD','EWR',50,50,200.00,1),
+(5,'EK',0,'2025-09-05 14:00:00','2025-09-05 16:00:00',120,'EWR','ORD',50,50,200.000,1),
+(6,'AA',0,'2025-09-04 15:00:00','2025-09-04 17:00:00',120,'ORD','EWR',50,50,100.00,2),
+(7,'AA',0,'2025-09-05 15:00:00','2025-09-05 17:00:00',120,'ORD','EWR',50,50,100.00,4),
+(8,'AA',0,'2025-09-06 15:00:00','2025-09-06 17:20:00',140,'EWR','ORD',50,50,150.00,4);
 /*!40000 ALTER TABLE `flights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -156,7 +163,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Dev','Patel','test','test@gmail.com','test','customer'),(2,'admin','admin','admin','admin@gmail.com','admin','admin'),(3,'Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),(4,'Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),(5,'Alek','test','Alek','test3@gmail.com','test','customer');
+INSERT INTO `users` VALUES (1,'Dev','Patel','test','test@gmail.com','test','customer'),(2,'admin','admin','admin','admin@gmail.com','admin','admin'),(3,'Neelesh','Talasila','Neelesh','test1@gmail.com','test','customer'),(4,'Pranav','Gummaluri','Pranav','test2@gmail.com','test','customer_rep'),(5,'Alek','Blanusa','Alek','test3@gmail.com','test','customer');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 

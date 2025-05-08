@@ -1,8 +1,13 @@
 <%@ page import="java.sql.*, java.util.*, cs336.pkg.CustomerRep, cs336.pkg.User" %>
 
 <%
+	
+	
+
     String action = request.getParameter("action");
     CustomerRep rep = new CustomerRep();  // Use your CustomerRep class
+    List<Map<String, Object>> pendingQuestions = rep.getPendingQuestions();
+	request.setAttribute("pendingQuestions", pendingQuestions);
 
     if (action != null) {
     	if ("makeReservation".equals(action)) {
@@ -36,7 +41,8 @@
             int questionId = Integer.parseInt(request.getParameter("questionId"));
             String answerText = request.getParameter("answerText");
             rep.replyToUser(questionId, answerText);
-            request.setAttribute("message", "Replied to user question successfully.");
+            response.sendRedirect("CustomerRep.jsp");
+            return;
         }
     }
 %>
@@ -113,24 +119,36 @@
     <h2>Reply to User Questions</h2>
 
     <table border="1">
-        <tr><th>Question ID</th><th>User ID</th><th>Flight ID</th><th>Question</th><th>Status</th></tr>
-        <% 
-            List<Map<String, Object>> pendingQuestions = (List<Map<String, Object>>) request.getAttribute("pendingQuestions");
-            if (pendingQuestions != null) {
-                for (Map<String, Object> question : pendingQuestions) {
-        %>
-            <tr>
-                <td><%= question.get("question_id") %></td>
-                <td><%= question.get("user_id") %></td>
-                <td><%= question.get("flight_id") %></td>
-                <td><%= question.get("question_text") %></td>
-                <td><%= ((int) question.get("answered") == 0 ? "Pending" : "Answered") %></td>
-            </tr>
-        <%  
-                }
-            } 
-        %>
-    </table>
+    <tr>
+        <th>QID</th>
+        <th>User</th>
+        <th>Email</th>
+        <th>Flight</th>
+        <th>Question</th>
+        <th>Status</th>
+    </tr>
+    <%
+        if (pendingQuestions != null && !pendingQuestions.isEmpty()) {
+            for (Map<String, Object> q : pendingQuestions) {
+    %>
+        <tr>
+            <td><%= q.get("question_id") %></td>
+            <td><%= q.get("firstname") %> <%= q.get("lastname") %></td>
+            <td><%= q.get("email") %></td>
+            <td><%= q.get("flight_id") %></td>
+            <td><%= q.get("question_text") %></td>
+            <td><%= ((int) q.get("answered") == 0 ? "Pending" : "Answered") %></td>
+        </tr>
+    <%
+            }
+        } else {
+    %>
+        <tr><td colspan="6" style="text-align:center;">No pending questions found.</td></tr>
+    <%
+        }
+    %>
+</table>
+
 
     <!-- Form to reply -->
     <form action="CustomerRep.jsp" method="post">

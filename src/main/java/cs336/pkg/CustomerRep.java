@@ -200,7 +200,11 @@ public class CustomerRep {
     // Get all unanswered user questions
     public List<Map<String, Object>> getPendingQuestions() {
         List<Map<String, Object>> result = new ArrayList<>();
-        String query = "SELECT * FROM questions WHERE answered = 0";
+        String query = "SELECT q.question_id, q.user_id, q.flight_id, q.question_text, q.answered, " +
+                       "u.firstname, u.lastname, u.email " +
+                       "FROM questions q " +
+                       "JOIN users u ON q.user_id = u.user_id " +
+                       "WHERE q.answered = 0";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -213,14 +217,20 @@ public class CustomerRep {
                 row.put("flight_id", rs.getInt("flight_id"));
                 row.put("question_text", rs.getString("question_text"));
                 row.put("answered", rs.getInt("answered"));
+                row.put("firstname", rs.getString("firstname"));
+                row.put("lastname", rs.getString("lastname"));
+                row.put("email", rs.getString("email"));
                 result.add(row);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return result;
     }
+
+
 
     // Get full user info for users in waiting list (for display)
     public List<User> getWaitingList() {
